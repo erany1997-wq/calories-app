@@ -508,13 +508,25 @@ function translateToEnglish(hebrewQuery) {
 
 function isHebrew(str) { return /[֐-׿]/.test(str); }
 
-// ---- Open Food Facts API (no key needed) ----
-async function fetchOFF(query, pageSize = 10) {
-  const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=${pageSize}&fields=product_name,product_name_he,brands,nutriments`;
-  const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
-  if (!res.ok) throw new Error("OFF error");
-  const data = await res.json();
-  return data.products || [];
+// ---- Search Engine: Multi-source with fallback ----
+
+// Try multiple OFF endpoints for reliability
+async function fetchOFF(query, pageSize = 20) {
+  // Try world server first, then specific country
+  const urls = [
+    `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=${pageSize}&fields=product_name,product_name_he,brands,nutriments,categories`,
+    `https://il.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=${pageSize}&fields=product_name,product_name_he,brands,nutriments`
+  ];
+  
+  for (const url of urls) {
+    try {
+      const res = await fetch(url, { signal: AbortSignal.timeout(7000) });
+      if (!res.ok) continue;
+      const data = await res.json();
+      if (data.products && data.products.length > 0) return data.products;
+    } catch(e) { continue; }
+  }
+  return [];
 }
 
 function parseOFFProduct(product) {
@@ -523,11 +535,11 @@ function parseOFFProduct(product) {
   const protein = n["proteins_100g"] || 0;
   const carbs   = n["carbohydrates_100g"] || 0;
   const fat     = n["fat_100g"] || 0;
-  const name    = product.product_name_he || product.product_name || "מוצר";
+  const name    = product.product_name_he || product.product_name || "";
   const brand   = product.brands ? ` · ${product.brands.split(",")[0].trim()}` : "";
   return {
     id: "off_" + Math.random().toString(36).slice(2),
-    name: name + brand,
+    name: (name + brand).trim() || "מוצר לא ידוע",
     emoji: "🛒",
     category: "other",
     isAPI: true,
@@ -540,43 +552,100 @@ function parseOFFProduct(product) {
   };
 }
 
+// Local fallback DB for common items that APIs miss
+const FALLBACK_FOODS = {
+  "mayonnaise": { cal:680, protein:1, carbs:0.6, fat:75, name:"Mayonnaise" },
+  "mayo": { cal:680, protein:1, carbs:0.6, fat:75, name:"Mayonnaise" },
+  "soy sauce": { cal:60, protein:8, carbs:5, fat:0, name:"Soy Sauce" },
+  "sushi": { cal:143, protein:5, carbs:28, fat:0.5, name:"Sushi Rice Roll" },
+  "tahini": { cal:595, protein:17, carbs:21, fat:53, name:"Tahini Sesame Paste" },
+  "olive oil": { cal:884, protein:0, carbs:0, fat:100, name:"Olive Oil" },
+  "ketchup": { cal:101, protein:1.7, carbs:25, fat:0.1, name:"Ketchup" },
+  "hummus": { cal:166, protein:8, carbs:14, fat:10, name:"Hummus" },
+  "peanut butter": { cal:588, protein:25, carbs:20, fat:50, name:"Peanut Butter" },
+  "cream cheese": { cal:342, protein:6, carbs:4, fat:34, name:"Cream Cheese" },
+  "sriracha": { cal:93, protein:3, carbs:18, fat:1, name:"Sriracha Hot Sauce" },
+  "pesto": { cal:430, protein:6, carbs:5, fat:43, name:"Pesto Sauce" },
+  "ranch": { cal:460, protein:1, carbs:6, fat:48, name:"Ranch Dressing" },
+  "caesar": { cal:360, protein:2, carbs:3, fat:38, name:"Caesar Dressing" },
+  "bbq sauce": { cal:172, protein:1, carbs:40, fat:0.5, name:"BBQ Sauce" },
+  "mustard": { cal:66, protein:4, carbs:6, fat:4, name:"Mustard" },
+  "salsa": { cal:36, protein:2, carbs:7, fat:0.4, name:"Salsa" },
+  "guacamole": { cal:160, protein:2, carbs:9, fat:15, name:"Guacamole" },
+  "sesame oil": { cal:884, protein:0, carbs:0, fat:100, name:"Sesame Oil" },
+  "coconut oil": { cal:862, protein:0, carbs:0, fat:100, name:"Coconut Oil" },
+  "butter": { cal:717, protein:0.9, carbs:0.1, fat:81, name:"Butter" },
+  "cream": { cal:340, protein:2, carbs:3, fat:35, name:"Heavy Cream" },
+  "chocolate": { cal:546, protein:5, carbs:60, fat:31, name:"Milk Chocolate" },
+  "honey": { cal:304, protein:0.3, carbs:82, fat:0, name:"Honey" },
+  "jam": { cal:250, protein:0.5, carbs:62, fat:0.1, name:"Fruit Jam" },
+  "maple syrup": { cal:260, protein:0, carbs:67, fat:0.1, name:"Maple Syrup" },
+  "vinegar": { cal:18, protein:0, carbs:0.9, fat:0, name:"Vinegar" },
+  "teriyaki": { cal:89, protein:5, carbs:15, fat:1, name:"Teriyaki Sauce" },
+  "worcestershire": { cal:78, protein:0, carbs:20, fat:0, name:"Worcestershire Sauce" },
+};
+
+function searchFallback(query) {
+  const q = query.toLowerCase();
+  const results = [];
+  for (const [key, val] of Object.entries(FALLBACK_FOODS)) {
+    if (key.includes(q) || q.includes(key.split(" ")[0])) {
+      results.push({
+        id: "fb_" + key.replace(/\s/g,"_"),
+        name: val.name,
+        emoji: "🍶",
+        category: "other",
+        isAPI: true,
+        per100: { cal: val.cal, protein: val.protein, carbs: val.carbs, fat: val.fat }
+      });
+    }
+  }
+  return results;
+}
+
 async function searchAllAPIs(query) {
-  // Build list of queries: Hebrew + English translation + original
-  const queries = new Set();
+  const englishQuery = isHebrew(query) ? (translateToEnglish(query) || query) : query;
+  const allQueries = new Set([englishQuery]);
+  
+  // Add word-by-word translation for multi-word Hebrew
   if (isHebrew(query)) {
-    const en = translateToEnglish(query);
-    if (en) queries.add(en);
-    // also try each word translated
     const words = query.split(" ");
     if (words.length > 1) {
-      const enWords = words.map(w => translateToEnglish(w) || w).join(" ");
-      queries.add(enWords);
+      const translated = words.map(w => translateToEnglish(w) || w).join(" ");
+      if (translated !== query) allQueries.add(translated);
     }
-  } else {
-    queries.add(query);
+    // Also add individual translated words
+    words.forEach(w => { const t = translateToEnglish(w); if (t) allQueries.add(t); });
   }
-  // always add original too (might be English or brand name)
-  queries.add(query);
 
-  // Fire all OFF queries in parallel
-  const allSettled = await Promise.allSettled(
-    [...queries].map(q => fetchOFF(q, 15))
-  );
+  // Always search original too (might be English)
+  allQueries.add(query);
 
   const seen = new Set();
   const results = [];
-  for (const r of allSettled) {
+
+  // 1. Local fallback first (instant, reliable)
+  const fallback = searchFallback(englishQuery);
+  fallback.forEach(f => { seen.add(f.name.toLowerCase()); results.push(f); });
+
+  // 2. OFF API queries in parallel
+  const settled = await Promise.allSettled([...allQueries].map(q => fetchOFF(q, 15)));
+  
+  for (const r of settled) {
     if (r.status !== "fulfilled") continue;
     for (const p of r.value) {
-      const name = (p.product_name_he || p.product_name || "").toLowerCase().slice(0, 30);
-      if (!name || seen.has(name)) continue;
+      const name = (p.product_name_he || p.product_name || "").trim();
+      if (!name) continue;
+      const key = name.toLowerCase().slice(0, 25);
+      if (seen.has(key)) continue;
       const n = p.nutriments || {};
       const cal = n["energy-kcal_100g"] || n["energy-kcal"] || 0;
       if (cal <= 0) continue;
-      seen.add(name);
+      seen.add(key);
       results.push(parseOFFProduct(p));
     }
   }
+
   return results;
 }
 
