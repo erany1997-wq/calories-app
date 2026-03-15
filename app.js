@@ -22,6 +22,8 @@ document.addEventListener("DOMContentLoaded", () => {
   initModals();
   registerSW();
   checkDayRollover();
+  // Weight tracking wired here so button exists in DOM
+  setTimeout(() => initWeightTracking(), 200);
 });
 
 function getTodayKey() {
@@ -1449,7 +1451,6 @@ function chartOptions(yLabel) {
 document.addEventListener("DOMContentLoaded", () => {
   showMotivationSplash();
   initWater();
-  initWeightTracking();
 
   // Water goal in settings
   document.getElementById("btn-save-water-goal")?.addEventListener("click", () => {
