@@ -253,7 +253,7 @@ select {
 .btn-danger:active {background:rgba(244,63,94,.2);transform:scale(0.97);}
 
 /* DASHBOARD */
-#screen-dashboard>*:not(.app-header):not(.bottom-nav) {overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;}
+/* dashboard children managed by dashboard-scroll */
 .calorie-hero {padding:24px 20px 8px;display:flex;flex-direction:column;align-items:center;gap:20px;}
 
 /* RING */
@@ -606,6 +606,10 @@ select {
    DASHBOARD SCROLL FIX
    ============================================================ */
 .dashboard-scroll {
-  flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 16px;
+  flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 24px;
+  min-height: 0;
 }
-#screen-dashboard > *:not(.app-header):not(.bottom-nav) { flex: none; }
+#screen-dashboard {
+  display: flex !important;
+  flex-direction: column !important;
+}

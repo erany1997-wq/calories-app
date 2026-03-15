@@ -1114,6 +1114,14 @@ function initWater() {
   loadWater();
   renderWater();
 
+  document.getElementById("btn-water-goal")?.addEventListener("click", () => {
+    navigateTo("settings");
+    setTimeout(() => {
+      document.getElementById("s-water-goal").focus();
+      document.getElementById("s-water-goal").scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 400);
+  });
+
   document.getElementById("btn-water-add").addEventListener("click", () => {
     if (waterCups < waterGoal) {
       waterCups++;
