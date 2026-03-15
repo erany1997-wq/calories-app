@@ -670,6 +670,34 @@ async function searchAllAPIs(query) {
   return results;
 }
 
+
+function renderLocalResults(results, container) {
+  if (!results.length) return;
+  const header = document.createElement("div");
+  header.className = "results-section-title";
+  header.textContent = "⭐ מאגר מקומי";
+  container.appendChild(header);
+  results.forEach(food => container.appendChild(createSearchResultEl(food)));
+}
+
+function createSearchResultEl(food) {
+  const el = document.createElement("div");
+  el.className = "search-result-item";
+  el.innerHTML = `
+    <div class="sr-icon"><i class="fa-solid fa-bowl-food"></i></div>
+    <div style="flex:1;min-width:0">
+      <div class="sr-name">${food.name}</div>
+      <div class="sr-meta">חלבון: ${food.per100.protein}g · פחמ': ${food.per100.carbs}g · שומן: ${food.per100.fat}g</div>
+    </div>
+    <span class="sr-cal">${food.per100.cal} קק"ל</span>
+  `;
+  el.addEventListener("click", () => {
+    closeModal("modal-add-food");
+    openPortionModal(food);
+  });
+  return el;
+}
+
 async function renderSearchResults(q) {
   const container = document.getElementById("search-results");
   if (!q || q.length < 2) { container.innerHTML = ""; return; }
