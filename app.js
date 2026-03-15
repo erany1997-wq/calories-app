@@ -204,11 +204,14 @@ function initDarkMode() {
   }
   // Create dark mode button dynamically and add to header
   const headerRight = document.querySelector(".header-right");
+  const isDarkNow = localStorage.getItem("darkMode") === "true";
   if (headerRight && !document.getElementById("btn-dark-toggle")) {
-    const btn = document.createElement("div");
+    const btn = document.createElement("button");
     btn.id = "btn-dark-toggle";
-    btn.className = "dark-toggle";
+    btn.className = "icon-btn";
     btn.title = "מצב לילה";
+    btn.innerHTML = isDarkNow ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    btn.style.cssText = "font-size:16px;";
     btn.onclick = toggleDarkMode;
     headerRight.insertBefore(btn, headerRight.firstChild);
   }
@@ -219,11 +222,14 @@ function toggleDarkMode() {
   if (isDark) {
     document.documentElement.removeAttribute("data-theme");
     localStorage.setItem("darkMode", "false");
+    const btn = document.getElementById("btn-dark-toggle");
+    if (btn) btn.innerHTML = '<i class="fa-solid fa-moon"></i>';
   } else {
     document.documentElement.setAttribute("data-theme", "dark");
     localStorage.setItem("darkMode", "true");
+    const btn = document.getElementById("btn-dark-toggle");
+    if (btn) btn.innerHTML = '<i class="fa-solid fa-sun"></i>';
   }
-  // Re-render charts with new colors
   if (document.getElementById("screen-stats")?.classList.contains("active")) {
     renderCharts();
     renderWeightChart();
