@@ -1,5 +1,5 @@
 // Service Worker for Nutrition Tracker PWA
-const CACHE_NAME = "nutrition-v24";
+const CACHE_NAME = "nutrition-v25";
 const ASSETS = [
   "./",
   "./index.html",
