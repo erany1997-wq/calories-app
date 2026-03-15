@@ -518,22 +518,57 @@ function translateToEnglish(hebrewQuery) {
 
 function isHebrew(str) { return /[֐-׿]/.test(str); }
 
-// ---- Search Engine: Multi-source with fallback ----
+// ---- Search Engine: Israeli Gov DB + Open Food Facts ----
 
-// Try multiple OFF endpoints for reliability
-async function fetchOFF(query, pageSize = 20) {
-  // Try world server first, then specific country
+// Israeli Ministry of Health - National Nutrition Database (data.gov.il)
+// 4500+ Israeli food items, free, no API key needed
+const IL_RESOURCE_ID = "b8bfd5a5-e6ce-4e89-8783-5e3f9a8b8a4f";
+
+async function searchIsraeliGovDB(query) {
+  const url = `https://data.gov.il/api/3/action/datastore_search?resource_id=${IL_RESOURCE_ID}&limit=15&q=${encodeURIComponent(query)}`;
+  const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
+  if (!res.ok) throw new Error("IL Gov API error");
+  const data = await res.json();
+  if (!data.success) throw new Error("IL Gov API failed");
+  return data.result?.records || [];
+}
+
+function parseIsraeliGovFood(record) {
+  // Field names from the Israeli National Nutrition Database
+  const name = record["שם מזון"] || record["food_name"] || record["FoodName"] || record["name"] || "מזון ישראלי";
+  const cal  = parseFloat(record["אנרגיה (קק"ל)"] || record["energy_kcal"] || record["calories"] || record["Calories"] || 0);
+  const protein = parseFloat(record["חלבון (ג')"] || record["protein"] || record["Protein"] || 0);
+  const carbs   = parseFloat(record["פחמימות (ג')"] || record["carbohydrates"] || record["Carbohydrates"] || 0);
+  const fat     = parseFloat(record["שומן (ג')"] || record["fat"] || record["Fat"] || 0);
+
+  if (!name || cal <= 0) return null;
+
+  return {
+    id: "il_" + (record["_id"] || Math.random().toString(36).slice(2)),
+    name: name.trim(),
+    emoji: "🇮🇱",
+    category: "other",
+    isAPI: true,
+    per100: {
+      cal: Math.round(cal),
+      protein: Math.round(protein * 10) / 10,
+      carbs:   Math.round(carbs * 10) / 10,
+      fat:     Math.round(fat * 10) / 10
+    }
+  };
+}
+
+// Open Food Facts fallback
+async function fetchOFF(query, pageSize = 10) {
   const urls = [
-    `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=${pageSize}&fields=product_name,product_name_he,brands,nutriments,categories`,
-    `https://il.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=${pageSize}&fields=product_name,product_name_he,brands,nutriments`
+    `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=${pageSize}&fields=product_name,product_name_he,brands,nutriments`,
   ];
-  
   for (const url of urls) {
     try {
-      const res = await fetch(url, { signal: AbortSignal.timeout(7000) });
+      const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
       if (!res.ok) continue;
       const data = await res.json();
-      if (data.products && data.products.length > 0) return data.products;
+      if (data.products?.length > 0) return data.products;
     } catch(e) { continue; }
   }
   return [];
@@ -547,9 +582,10 @@ function parseOFFProduct(product) {
   const fat     = n["fat_100g"] || 0;
   const name    = product.product_name_he || product.product_name || "";
   const brand   = product.brands ? ` · ${product.brands.split(",")[0].trim()}` : "";
+  if (!name || cal <= 0) return null;
   return {
     id: "off_" + Math.random().toString(36).slice(2),
-    name: (name + brand).trim() || "מוצר לא ידוע",
+    name: (name + brand).trim(),
     emoji: "🛒",
     category: "other",
     isAPI: true,
@@ -562,97 +598,72 @@ function parseOFFProduct(product) {
   };
 }
 
-// Local fallback DB for common items that APIs miss
-const FALLBACK_FOODS = {
-  "mayonnaise": { cal:680, protein:1, carbs:0.6, fat:75, name:"Mayonnaise" },
-  "mayo": { cal:680, protein:1, carbs:0.6, fat:75, name:"Mayonnaise" },
-  "soy sauce": { cal:60, protein:8, carbs:5, fat:0, name:"Soy Sauce" },
-  "sushi": { cal:143, protein:5, carbs:28, fat:0.5, name:"Sushi Rice Roll" },
-  "tahini": { cal:595, protein:17, carbs:21, fat:53, name:"Tahini Sesame Paste" },
-  "olive oil": { cal:884, protein:0, carbs:0, fat:100, name:"Olive Oil" },
-  "ketchup": { cal:101, protein:1.7, carbs:25, fat:0.1, name:"Ketchup" },
-  "hummus": { cal:166, protein:8, carbs:14, fat:10, name:"Hummus" },
-  "peanut butter": { cal:588, protein:25, carbs:20, fat:50, name:"Peanut Butter" },
-  "cream cheese": { cal:342, protein:6, carbs:4, fat:34, name:"Cream Cheese" },
-  "sriracha": { cal:93, protein:3, carbs:18, fat:1, name:"Sriracha Hot Sauce" },
-  "pesto": { cal:430, protein:6, carbs:5, fat:43, name:"Pesto Sauce" },
-  "ranch": { cal:460, protein:1, carbs:6, fat:48, name:"Ranch Dressing" },
-  "caesar": { cal:360, protein:2, carbs:3, fat:38, name:"Caesar Dressing" },
-  "bbq sauce": { cal:172, protein:1, carbs:40, fat:0.5, name:"BBQ Sauce" },
-  "mustard": { cal:66, protein:4, carbs:6, fat:4, name:"Mustard" },
-  "salsa": { cal:36, protein:2, carbs:7, fat:0.4, name:"Salsa" },
-  "guacamole": { cal:160, protein:2, carbs:9, fat:15, name:"Guacamole" },
-  "sesame oil": { cal:884, protein:0, carbs:0, fat:100, name:"Sesame Oil" },
-  "coconut oil": { cal:862, protein:0, carbs:0, fat:100, name:"Coconut Oil" },
-  "butter": { cal:717, protein:0.9, carbs:0.1, fat:81, name:"Butter" },
-  "cream": { cal:340, protein:2, carbs:3, fat:35, name:"Heavy Cream" },
-  "chocolate": { cal:546, protein:5, carbs:60, fat:31, name:"Milk Chocolate" },
-  "honey": { cal:304, protein:0.3, carbs:82, fat:0, name:"Honey" },
-  "jam": { cal:250, protein:0.5, carbs:62, fat:0.1, name:"Fruit Jam" },
-  "maple syrup": { cal:260, protein:0, carbs:67, fat:0.1, name:"Maple Syrup" },
-  "vinegar": { cal:18, protein:0, carbs:0.9, fat:0, name:"Vinegar" },
-  "teriyaki": { cal:89, protein:5, carbs:15, fat:1, name:"Teriyaki Sauce" },
-  "worcestershire": { cal:78, protein:0, carbs:20, fat:0, name:"Worcestershire Sauce" },
+// Local instant fallback for common items
+const INSTANT_FOODS = {
+  "מיונז": {cal:680,protein:1,carbs:0.6,fat:75,name:"מיונז"},
+  "מיונז קל": {cal:300,protein:1.5,carbs:8,fat:30,name:"מיונז קל 30%"},
+  "מיונז סושי": {cal:500,protein:1,carbs:5,fat:52,name:"מיונז סושי (ספייסי)"},
+  "סויה": {cal:60,protein:8,carbs:5,fat:0,name:"רוטב סויה"},
+  "רוטב סויה": {cal:60,protein:8,carbs:5,fat:0,name:"רוטב סויה"},
+  "קטשופ": {cal:101,protein:1.7,carbs:25,fat:0.1,name:"קטשופ"},
+  "חרדל": {cal:66,protein:4,carbs:6,fat:4,name:"חרדל"},
+  "טחינה": {cal:570,protein:17,carbs:26,fat:48,name:"טחינה גולמית"},
+  "סריראצ'ה": {cal:93,protein:3,carbs:18,fat:1,name:"סריראצ'ה"},
+  "פסטו": {cal:430,protein:6,carbs:5,fat:43,name:"פסטו"},
+  "bbq": {cal:172,protein:1,carbs:40,fat:0.5,name:"רוטב BBQ"},
+  "ברביקיו": {cal:172,protein:1,carbs:40,fat:0.5,name:"רוטב BBQ"},
+  "נוטלה": {cal:539,protein:6,carbs:58,fat:31,name:"נוטלה"},
+  "שמן זית": {cal:884,protein:0,carbs:0,fat:100,name:"שמן זית"},
+  "חמאה": {cal:717,protein:0.9,carbs:0.1,fat:81,name:"חמאה"},
 };
 
-function searchFallback(query) {
-  const q = query.toLowerCase();
-  const results = [];
-  for (const [key, val] of Object.entries(FALLBACK_FOODS)) {
-    if (key.includes(q) || q.includes(key.split(" ")[0])) {
-      results.push({
-        id: "fb_" + key.replace(/\s/g,"_"),
-        name: val.name,
-        emoji: "🍶",
-        category: "other",
-        isAPI: true,
-        per100: { cal: val.cal, protein: val.protein, carbs: val.carbs, fat: val.fat }
-      });
-    }
-  }
-  return results;
+function searchInstant(query) {
+  const q = query.toLowerCase().trim();
+  return Object.entries(INSTANT_FOODS)
+    .filter(([k]) => q.includes(k) || k.includes(q))
+    .map(([, v]) => ({
+      id: "inst_" + v.name,
+      name: v.name,
+      emoji: "⭐",
+      category: "sauces",
+      isAPI: false,
+      per100: {cal:v.cal, protein:v.protein, carbs:v.carbs, fat:v.fat}
+    }));
 }
 
 async function searchAllAPIs(query) {
   const englishQuery = isHebrew(query) ? (translateToEnglish(query) || query) : query;
-  const allQueries = new Set([englishQuery]);
-  
-  // Add word-by-word translation for multi-word Hebrew
-  if (isHebrew(query)) {
-    const words = query.split(" ");
-    if (words.length > 1) {
-      const translated = words.map(w => translateToEnglish(w) || w).join(" ");
-      if (translated !== query) allQueries.add(translated);
-    }
-    // Also add individual translated words
-    words.forEach(w => { const t = translateToEnglish(w); if (t) allQueries.add(t); });
-  }
-
-  // Always search original too (might be English)
-  allQueries.add(query);
-
   const seen = new Set();
   const results = [];
 
-  // 1. Local fallback first (instant, reliable)
-  const fallback = searchFallback(englishQuery);
-  fallback.forEach(f => { seen.add(f.name.toLowerCase()); results.push(f); });
+  // 1. Instant local match (immediate)
+  const instant = searchInstant(query);
+  instant.forEach(f => { seen.add(f.name); results.push(f); });
 
-  // 2. OFF API queries in parallel
-  const settled = await Promise.allSettled([...allQueries].map(q => fetchOFF(q, 15)));
-  
-  for (const r of settled) {
-    if (r.status !== "fulfilled") continue;
-    for (const p of r.value) {
-      const name = (p.product_name_he || p.product_name || "").trim();
-      if (!name) continue;
-      const key = name.toLowerCase().slice(0, 25);
-      if (seen.has(key)) continue;
-      const n = p.nutriments || {};
-      const cal = n["energy-kcal_100g"] || n["energy-kcal"] || 0;
-      if (cal <= 0) continue;
-      seen.add(key);
-      results.push(parseOFFProduct(p));
+  // 2. Israeli Gov DB (Hebrew search — best for Israeli foods!)
+  // 3. Open Food Facts (English search)
+  const [ilRes, offRes] = await Promise.allSettled([
+    searchIsraeliGovDB(query),
+    fetchOFF(isHebrew(query) ? englishQuery : query, 12)
+  ]);
+
+  // Israeli Gov results
+  if (ilRes.status === "fulfilled") {
+    for (const record of ilRes.value) {
+      const food = parseIsraeliGovFood(record);
+      if (!food || seen.has(food.name)) continue;
+      seen.add(food.name);
+      results.push(food);
+    }
+  }
+
+  // OFF results
+  if (offRes.status === "fulfilled") {
+    for (const p of offRes.value) {
+      const food = parseOFFProduct(p);
+      if (!food || seen.has(food.name.slice(0,20))) continue;
+      seen.add(food.name.slice(0,20));
+      results.push(food);
     }
   }
 
@@ -678,7 +689,7 @@ async function renderSearchResults(q) {
   const loadingEl = document.createElement("div");
   loadingEl.id = "api-loading";
   loadingEl.className = "api-loading";
-  loadingEl.innerHTML = `<span class="spinner"></span> מחפש${searchNote}...`;
+  loadingEl.innerHTML = `<span class="spinner"></span> מחפש במאגר ישראלי + עולמי${searchNote}...`;
   container.appendChild(loadingEl);
 
   try {
@@ -695,7 +706,9 @@ async function renderSearchResults(q) {
     if (products.length > 0) {
       const header = document.createElement("div");
       header.className = "results-section-title";
-      header.textContent = `🌍 ${products.length} תוצאות`;
+      const ilCount = products.filter(f=>f.id?.startsWith("il_")).length;
+      const localCount = products.filter(f=>!f.isAPI).length;
+      header.textContent = `🇮🇱 ${ilCount} ישראלי · 🌍 ${products.length - ilCount} עולמי`;
       container.appendChild(header);
       products.slice(0, 15).forEach(f => container.appendChild(createSearchResultEl(f)));
     }
@@ -726,7 +739,7 @@ async function searchFoodDBWithAPI(query) {
   const searchNote = englishQuery ? ` ← "${englishQuery}"` : "";
   const loadEl = document.createElement("div");
   loadEl.id = "db-loading"; loadEl.className = "api-loading";
-  loadEl.innerHTML = `<span class="spinner"></span> מחפש${searchNote}...`;
+  loadEl.innerHTML = `<span class="spinner"></span> מחפש במאגר ישראלי + עולמי${searchNote}...`;
   list.appendChild(loadEl);
 
   try {
