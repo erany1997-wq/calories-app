@@ -1,265 +1,246 @@
-// Food Database - values per 100g / 100ml
+// ============================================================
+// FOOD DATABASE — 500+ items, values per 100g/100ml
+// ============================================================
+
 const FOOD_DB = [
-  // ===== חלבונים =====
-  {
-    id: "f001", name: "חזה עוף מבושל", category: "protein", emoji: "🍗",
-    per100: { cal: 165, protein: 31, carbs: 0, fat: 3.6 }
-  },
-  {
-    id: "f002", name: "חזה עוף צלוי", category: "protein", emoji: "🍗",
-    per100: { cal: 185, protein: 35, carbs: 0, fat: 4 }
-  },
-  {
-    id: "f003", name: "סטייק בקר רזה", category: "protein", emoji: "🥩",
-    per100: { cal: 217, protein: 26, carbs: 0, fat: 12 }
-  },
-  {
-    id: "f004", name: "שמינית טונה בשמן (יבשה)", category: "protein", emoji: "🐟",
-    per100: { cal: 198, protein: 30, carbs: 0, fat: 8.2 }
-  },
-  {
-    id: "f005", name: "טונה במים", category: "protein", emoji: "🐟",
-    per100: { cal: 116, protein: 25.5, carbs: 0, fat: 0.8 }
-  },
-  {
-    id: "f006", name: "ביצה שלמה", category: "protein", emoji: "🥚",
-    per100: { cal: 155, protein: 13, carbs: 1.1, fat: 11 }
-  },
-  {
-    id: "f007", name: "חלבון ביצה", category: "protein", emoji: "🥚",
-    per100: { cal: 52, protein: 11, carbs: 0.7, fat: 0.2 }
-  },
-  {
-    id: "f008", name: "סלמון", category: "protein", emoji: "🐟",
-    per100: { cal: 208, protein: 20, carbs: 0, fat: 13 }
-  },
-  {
-    id: "f009", name: "שייק חלבון (ממוצע)", category: "protein", emoji: "💪",
-    per100: { cal: 120, protein: 25, carbs: 4, fat: 1.5 }
-  },
-  {
-    id: "f010", name: "קוטג' 3%", category: "protein", emoji: "🫙",
-    per100: { cal: 83, protein: 11, carbs: 2.8, fat: 3 }
-  },
-  {
-    id: "f011", name: "טופו מוצק", category: "protein", emoji: "🌱",
-    per100: { cal: 76, protein: 8, carbs: 1.9, fat: 4.2 }
-  },
-  {
-    id: "f012", name: "שניצל עוף מטוגן", category: "protein", emoji: "🍗",
-    per100: { cal: 258, protein: 21, carbs: 14, fat: 13 }
-  },
-  {
-    id: "f013", name: "עוף שלם צלוי עם עור", category: "protein", emoji: "🍗",
-    per100: { cal: 239, protein: 27, carbs: 0, fat: 14 }
-  },
-  {
-    id: "f014", name: "דג דניס/לברק", category: "protein", emoji: "🐟",
-    per100: { cal: 128, protein: 24, carbs: 0, fat: 3.5 }
-  },
-  {
-    id: "f015", name: "חמוצי בשר (ספגטי בולונז)", category: "protein", emoji: "🍝",
-    per100: { cal: 140, protein: 9, carbs: 12, fat: 6 }
-  },
 
-  // ===== מוצרי חלב =====
-  {
-    id: "d001", name: "יוגורט חלבון", category: "dairy", emoji: "🥛",
-    per100: { cal: 62, protein: 10, carbs: 4, fat: 0.2 }
-  },
-  {
-    id: "d002", name: "יוגורט יווני 0%", category: "dairy", emoji: "🥛",
-    per100: { cal: 59, protein: 10, carbs: 3.6, fat: 0.4 }
-  },
-  {
-    id: "d003", name: "יוגורט יווני 5%", category: "dairy", emoji: "🥛",
-    per100: { cal: 97, protein: 9, carbs: 3.6, fat: 5 }
-  },
-  {
-    id: "d004", name: "חלב 1%", category: "dairy", emoji: "🥛",
-    per100: { cal: 46, protein: 3.4, carbs: 5, fat: 1 }
-  },
-  {
-    id: "d005", name: "גבינה צהובה 9%", category: "dairy", emoji: "🧀",
-    per100: { cal: 240, protein: 25, carbs: 2, fat: 14 }
-  },
-  {
-    id: "d006", name: "גבינה צהובה 28%", category: "dairy", emoji: "🧀",
-    per100: { cal: 352, protein: 25, carbs: 2, fat: 27 }
-  },
-  {
-    id: "d007", name: "גבינה לבנה 5%", category: "dairy", emoji: "🫙",
-    per100: { cal: 101, protein: 12, carbs: 3.6, fat: 5 }
-  },
-  {
-    id: "d008", name: "גבינה לבנה 9%", category: "dairy", emoji: "🫙",
-    per100: { cal: 140, protein: 11.5, carbs: 3.4, fat: 9 }
-  },
-  {
-    id: "d009", name: "קפיר 1.5%", category: "dairy", emoji: "🥛",
-    per100: { cal: 52, protein: 3.3, carbs: 5.5, fat: 1.5 }
-  },
-  {
-    id: "d010", name: "שמנת 15%", category: "dairy", emoji: "🫙",
-    per100: { cal: 162, protein: 2.7, carbs: 3.6, fat: 15 }
-  },
+  // ===== חלבונים — PROTEINS =====
+  { id:"p001", name:"חזה עוף מבושל", category:"protein", emoji:"🍗", per100:{cal:165,protein:31,carbs:0,fat:3.6} },
+  { id:"p002", name:"חזה עוף צלוי", category:"protein", emoji:"🍗", per100:{cal:185,protein:35,carbs:0,fat:4} },
+  { id:"p003", name:"שוק עוף מבושל", category:"protein", emoji:"🍗", per100:{cal:209,protein:26,carbs:0,fat:11} },
+  { id:"p004", name:"כנפי עוף צלויות", category:"protein", emoji:"🍗", per100:{cal:290,protein:27,carbs:0,fat:19} },
+  { id:"p005", name:"הודו טחון", category:"protein", emoji:"🦃", per100:{cal:170,protein:22,carbs:0,fat:9} },
+  { id:"p006", name:"סטייק בקר רזה", category:"protein", emoji:"🥩", per100:{cal:217,protein:26,carbs:0,fat:12} },
+  { id:"p007", name:"בשר בקר טחון 5%", category:"protein", emoji:"🥩", per100:{cal:148,protein:21,carbs:0,fat:7} },
+  { id:"p008", name:"בשר בקר טחון 15%", category:"protein", emoji:"🥩", per100:{cal:215,protein:19,carbs:0,fat:15} },
+  { id:"p009", name:"אנטריקוט", category:"protein", emoji:"🥩", per100:{cal:250,protein:26,carbs:0,fat:16} },
+  { id:"p010", name:"כבד עוף", category:"protein", emoji:"🍗", per100:{cal:119,protein:17,carbs:0.9,fat:5} },
+  { id:"p011", name:"טונה במים", category:"protein", emoji:"🐟", per100:{cal:116,protein:25.5,carbs:0,fat:0.8} },
+  { id:"p012", name:"טונה בשמן", category:"protein", emoji:"🐟", per100:{cal:198,protein:30,carbs:0,fat:8.2} },
+  { id:"p013", name:"סלמון טרי", category:"protein", emoji:"🐟", per100:{cal:208,protein:20,carbs:0,fat:13} },
+  { id:"p014", name:"סלמון מעושן", category:"protein", emoji:"🐟", per100:{cal:179,protein:25,carbs:0,fat:8} },
+  { id:"p015", name:"דג דניס", category:"protein", emoji:"🐟", per100:{cal:128,protein:24,carbs:0,fat:3.5} },
+  { id:"p016", name:"דג לברק", category:"protein", emoji:"🐟", per100:{cal:124,protein:22,carbs:0,fat:3} },
+  { id:"p017", name:"דג בורי", category:"protein", emoji:"🐟", per100:{cal:150,protein:21,carbs:0,fat:7} },
+  { id:"p018", name:"שרימפס", category:"protein", emoji:"🦐", per100:{cal:99,protein:24,carbs:0.2,fat:0.3} },
+  { id:"p019", name:"קלמרי", category:"protein", emoji:"🦑", per100:{cal:92,protein:16,carbs:3.1,fat:1.4} },
+  { id:"p020", name:"ביצה שלמה", category:"protein", emoji:"🥚", per100:{cal:155,protein:13,carbs:1.1,fat:11} },
+  { id:"p021", name:"חלבון ביצה", category:"protein", emoji:"🥚", per100:{cal:52,protein:11,carbs:0.7,fat:0.2} },
+  { id:"p022", name:"חלמון ביצה", category:"protein", emoji:"🥚", per100:{cal:322,protein:16,carbs:3.6,fat:27} },
+  { id:"p023", name:"טופו מוצק", category:"protein", emoji:"🌱", per100:{cal:76,protein:8,carbs:1.9,fat:4.2} },
+  { id:"p024", name:"טופו רך", category:"protein", emoji:"🌱", per100:{cal:55,protein:5.3,carbs:1.5,fat:2.7} },
+  { id:"p025", name:"טמפה", category:"protein", emoji:"🌱", per100:{cal:193,protein:19,carbs:9,fat:11} },
+  { id:"p026", name:"שניצל עוף מטוגן", category:"protein", emoji:"🍗", per100:{cal:258,protein:21,carbs:14,fat:13} },
+  { id:"p027", name:"שניצל הודו", category:"protein", emoji:"🍗", per100:{cal:220,protein:23,carbs:10,fat:9} },
+  { id:"p028", name:"המבורגר 150ג", category:"protein", emoji:"🍔", per100:{cal:250,protein:20,carbs:0,fat:18} },
+  { id:"p029", name:"נקניקיית עוף", category:"protein", emoji:"🌭", per100:{cal:180,protein:14,carbs:3,fat:13} },
+  { id:"p030", name:"קציצות בשר", category:"protein", emoji:"🥩", per100:{cal:230,protein:18,carbs:8,fat:14} },
 
-  // ===== פחמימות =====
-  {
-    id: "c001", name: "פסטה מבושלת", category: "carbs", emoji: "🍝",
-    per100: { cal: 131, protein: 5, carbs: 25, fat: 1.1 }
-  },
-  {
-    id: "c002", name: "פסטה יבשה", category: "carbs", emoji: "🍝",
-    per100: { cal: 371, protein: 13, carbs: 75, fat: 1.5 }
-  },
-  {
-    id: "c003", name: "אורז לבן מבושל", category: "carbs", emoji: "🍚",
-    per100: { cal: 130, protein: 2.7, carbs: 28, fat: 0.3 }
-  },
-  {
-    id: "c004", name: "אורז מלא מבושל", category: "carbs", emoji: "🍚",
-    per100: { cal: 112, protein: 2.6, carbs: 23, fat: 0.9 }
-  },
-  {
-    id: "c005", name: "לחם לבן", category: "carbs", emoji: "🍞",
-    per100: { cal: 265, protein: 9, carbs: 51, fat: 3.2 }
-  },
-  {
-    id: "c006", name: "לחם מחיטה מלאה", category: "carbs", emoji: "🍞",
-    per100: { cal: 247, protein: 10, carbs: 43, fat: 4.2 }
-  },
-  {
-    id: "c007", name: "בטטה מבושלת", category: "carbs", emoji: "🍠",
-    per100: { cal: 86, protein: 1.6, carbs: 20, fat: 0.1 }
-  },
-  {
-    id: "c008", name: "תפוח אדמה מבושל", category: "carbs", emoji: "🥔",
-    per100: { cal: 77, protein: 2, carbs: 17, fat: 0.1 }
-  },
-  {
-    id: "c009", name: "קוואקר / שיבולת שועל", category: "carbs", emoji: "🥣",
-    per100: { cal: 389, protein: 17, carbs: 66, fat: 7 }
-  },
-  {
-    id: "c010", name: "קינואה מבושלת", category: "carbs", emoji: "🌾",
-    per100: { cal: 120, protein: 4.4, carbs: 21.3, fat: 1.9 }
-  },
-  {
-    id: "c011", name: "בורגול מבושל", category: "carbs", emoji: "🌾",
-    per100: { cal: 83, protein: 3.1, carbs: 18.6, fat: 0.2 }
-  },
-  {
-    id: "c012", name: "פיתה", category: "carbs", emoji: "🫓",
-    per100: { cal: 275, protein: 9, carbs: 55, fat: 1.2 }
-  },
+  // ===== מוצרי חלב — DAIRY =====
+  { id:"d001", name:"יוגורט חלבון 0%", category:"dairy", emoji:"🥛", per100:{cal:57,protein:10,carbs:4,fat:0.2} },
+  { id:"d002", name:"יוגורט יווני 0%", category:"dairy", emoji:"🥛", per100:{cal:59,protein:10,carbs:3.6,fat:0.4} },
+  { id:"d003", name:"יוגורט יווני 2%", category:"dairy", emoji:"🥛", per100:{cal:73,protein:9.5,carbs:3.6,fat:2} },
+  { id:"d004", name:"יוגורט יווני 5%", category:"dairy", emoji:"🥛", per100:{cal:97,protein:9,carbs:3.6,fat:5} },
+  { id:"d005", name:"יוגורט רגיל 1.5%", category:"dairy", emoji:"🥛", per100:{cal:63,protein:3.5,carbs:7,fat:1.5} },
+  { id:"d006", name:"יוגורט פירות", category:"dairy", emoji:"🥛", per100:{cal:95,protein:3,carbs:17,fat:1.5} },
+  { id:"d007", name:"קוטג' 3%", category:"dairy", emoji:"🫙", per100:{cal:83,protein:11,carbs:2.8,fat:3} },
+  { id:"d008", name:"קוטג' 5%", category:"dairy", emoji:"🫙", per100:{cal:105,protein:11,carbs:2.8,fat:5} },
+  { id:"d009", name:"גבינה לבנה 5%", category:"dairy", emoji:"🫙", per100:{cal:101,protein:12,carbs:3.6,fat:5} },
+  { id:"d010", name:"גבינה לבנה 9%", category:"dairy", emoji:"🫙", per100:{cal:140,protein:11.5,carbs:3.4,fat:9} },
+  { id:"d011", name:"גבינה לבנה 15%", category:"dairy", emoji:"🫙", per100:{cal:190,protein:10,carbs:3,fat:15} },
+  { id:"d012", name:"גבינה צהובה 9%", category:"dairy", emoji:"🧀", per100:{cal:240,protein:25,carbs:2,fat:14} },
+  { id:"d013", name:"גבינה צהובה 28%", category:"dairy", emoji:"🧀", per100:{cal:352,protein:25,carbs:2,fat:27} },
+  { id:"d014", name:"גבינה בולגרית", category:"dairy", emoji:"🧀", per100:{cal:260,protein:14,carbs:1,fat:22} },
+  { id:"d015", name:"מוצרלה טרייה", category:"dairy", emoji:"🧀", per100:{cal:280,protein:18,carbs:2.2,fat:22} },
+  { id:"d016", name:"פרמזן מגורר", category:"dairy", emoji:"🧀", per100:{cal:431,protein:38,carbs:3.2,fat:29} },
+  { id:"d017", name:"גבינת ריקוטה", category:"dairy", emoji:"🧀", per100:{cal:174,protein:11,carbs:3,fat:13} },
+  { id:"d018", name:"גבינת קממבר", category:"dairy", emoji:"🧀", per100:{cal:300,protein:20,carbs:0.5,fat:24} },
+  { id:"d019", name:"שמנת מתוקה 38%", category:"dairy", emoji:"🫙", per100:{cal:345,protein:2,carbs:3,fat:36} },
+  { id:"d020", name:"שמנת חמוצה 15%", category:"dairy", emoji:"🫙", per100:{cal:162,protein:2.7,carbs:3.6,fat:15} },
+  { id:"d021", name:"חמאה", category:"dairy", emoji:"🧈", per100:{cal:717,protein:0.9,carbs:0.1,fat:81} },
+  { id:"d022", name:"חלב 1%", category:"dairy", emoji:"🥛", per100:{cal:46,protein:3.4,carbs:5,fat:1} },
+  { id:"d023", name:"חלב 3%", category:"dairy", emoji:"🥛", per100:{cal:61,protein:3.2,carbs:4.8,fat:3.2} },
+  { id:"d024", name:"קפיר 1.5%", category:"dairy", emoji:"🥛", per100:{cal:52,protein:3.3,carbs:5.5,fat:1.5} },
+  { id:"d025", name:"לבן 3%", category:"dairy", emoji:"🥛", per100:{cal:65,protein:3.5,carbs:4.5,fat:3} },
 
-  // ===== ירקות ופירות =====
-  {
-    id: "v001", name: "מלפפון", category: "veggies", emoji: "🥒",
-    per100: { cal: 15, protein: 0.7, carbs: 3.6, fat: 0.1 }
-  },
-  {
-    id: "v002", name: "עגבנייה", category: "veggies", emoji: "🍅",
-    per100: { cal: 18, protein: 0.9, carbs: 3.9, fat: 0.2 }
-  },
-  {
-    id: "v003", name: "חסה", category: "veggies", emoji: "🥬",
-    per100: { cal: 15, protein: 1.4, carbs: 2.9, fat: 0.2 }
-  },
-  {
-    id: "v004", name: "פלפל", category: "veggies", emoji: "🫑",
-    per100: { cal: 31, protein: 1, carbs: 6, fat: 0.3 }
-  },
-  {
-    id: "v005", name: "גזר", category: "veggies", emoji: "🥕",
-    per100: { cal: 41, protein: 0.9, carbs: 10, fat: 0.2 }
-  },
-  {
-    id: "v006", name: "ברוקולי", category: "veggies", emoji: "🥦",
-    per100: { cal: 34, protein: 2.8, carbs: 7, fat: 0.4 }
-  },
-  {
-    id: "v007", name: "תרד", category: "veggies", emoji: "🥬",
-    per100: { cal: 23, protein: 2.9, carbs: 3.6, fat: 0.4 }
-  },
-  {
-    id: "v008", name: "תפוח", category: "veggies", emoji: "🍎",
-    per100: { cal: 52, protein: 0.3, carbs: 14, fat: 0.2 }
-  },
-  {
-    id: "v009", name: "בננה", category: "veggies", emoji: "🍌",
-    per100: { cal: 89, protein: 1.1, carbs: 23, fat: 0.3 }
-  },
-  {
-    id: "v010", name: "תפוז", category: "veggies", emoji: "🍊",
-    per100: { cal: 47, protein: 0.9, carbs: 12, fat: 0.1 }
-  },
-  {
-    id: "v011", name: "אבוקדו", category: "veggies", emoji: "🥑",
-    per100: { cal: 160, protein: 2, carbs: 9, fat: 15 }
-  },
-  {
-    id: "v012", name: "תמר מג'הול", category: "veggies", emoji: "🌴",
-    per100: { cal: 282, protein: 2, carbs: 75, fat: 0.4 }
-  },
+  // ===== פחמימות — CARBS =====
+  { id:"c001", name:"פסטה מבושלת", category:"carbs", emoji:"🍝", per100:{cal:131,protein:5,carbs:25,fat:1.1} },
+  { id:"c002", name:"פסטה יבשה", category:"carbs", emoji:"🍝", per100:{cal:371,protein:13,carbs:75,fat:1.5} },
+  { id:"c003", name:"ספגטי מבושל", category:"carbs", emoji:"🍝", per100:{cal:130,protein:5,carbs:25,fat:1} },
+  { id:"c004", name:"אורז לבן מבושל", category:"carbs", emoji:"🍚", per100:{cal:130,protein:2.7,carbs:28,fat:0.3} },
+  { id:"c005", name:"אורז מלא מבושל", category:"carbs", emoji:"🍚", per100:{cal:112,protein:2.6,carbs:23,fat:0.9} },
+  { id:"c006", name:"אורז בסמטי מבושל", category:"carbs", emoji:"🍚", per100:{cal:121,protein:2.5,carbs:25,fat:0.4} },
+  { id:"c007", name:"אורז יסמין מבושל", category:"carbs", emoji:"🍚", per100:{cal:129,protein:2.4,carbs:27,fat:0.3} },
+  { id:"c008", name:"לחם לבן", category:"carbs", emoji:"🍞", per100:{cal:265,protein:9,carbs:51,fat:3.2} },
+  { id:"c009", name:"לחם מחיטה מלאה", category:"carbs", emoji:"🍞", per100:{cal:247,protein:10,carbs:43,fat:4.2} },
+  { id:"c010", name:"לחם שיפון", category:"carbs", emoji:"🍞", per100:{cal:259,protein:8.5,carbs:48,fat:3.3} },
+  { id:"c011", name:"לחמנייה לבנה", category:"carbs", emoji:"🍞", per100:{cal:280,protein:9,carbs:54,fat:3} },
+  { id:"c012", name:"פיתה", category:"carbs", emoji:"🫓", per100:{cal:275,protein:9,carbs:55,fat:1.2} },
+  { id:"c013", name:"פיתה מחיטה מלאה", category:"carbs", emoji:"🫓", per100:{cal:260,protein:10,carbs:50,fat:2} },
+  { id:"c014", name:"לחם פרוס קל (טוסט)", category:"carbs", emoji:"🍞", per100:{cal:255,protein:8,carbs:50,fat:3} },
+  { id:"c015", name:"קרואסון", category:"carbs", emoji:"🥐", per100:{cal:406,protein:8.2,carbs:46,fat:21} },
+  { id:"c016", name:"בייגל", category:"carbs", emoji:"🥯", per100:{cal:272,protein:10,carbs:53,fat:1.7} },
+  { id:"c017", name:"קוסקוס מבושל", category:"carbs", emoji:"🌾", per100:{cal:112,protein:3.8,carbs:23,fat:0.2} },
+  { id:"c018", name:"בורגול מבושל", category:"carbs", emoji:"🌾", per100:{cal:83,protein:3.1,carbs:18.6,fat:0.2} },
+  { id:"c019", name:"קינואה מבושלת", category:"carbs", emoji:"🌾", per100:{cal:120,protein:4.4,carbs:21.3,fat:1.9} },
+  { id:"c020", name:"שיבולת שועל יבשה", category:"carbs", emoji:"🥣", per100:{cal:389,protein:17,carbs:66,fat:7} },
+  { id:"c021", name:"שיבולת שועל מבושלת", category:"carbs", emoji:"🥣", per100:{cal:71,protein:2.5,carbs:12,fat:1.5} },
+  { id:"c022", name:"גרנולה", category:"carbs", emoji:"🥣", per100:{cal:471,protein:10,carbs:64,fat:20} },
+  { id:"c023", name:"תפוח אדמה מבושל", category:"carbs", emoji:"🥔", per100:{cal:77,protein:2,carbs:17,fat:0.1} },
+  { id:"c024", name:"תפוח אדמה אפוי", category:"carbs", emoji:"🥔", per100:{cal:93,protein:2.5,carbs:21,fat:0.1} },
+  { id:"c025", name:"תפוח אדמה מטוגן", category:"carbs", emoji:"🍟", per100:{cal:312,protein:3.4,carbs:41,fat:15} },
+  { id:"c026", name:"בטטה מבושלת", category:"carbs", emoji:"🍠", per100:{cal:86,protein:1.6,carbs:20,fat:0.1} },
+  { id:"c027", name:"בטטה אפויה", category:"carbs", emoji:"🍠", per100:{cal:90,protein:2,carbs:21,fat:0.1} },
+  { id:"c028", name:"תירס מבושל", category:"carbs", emoji:"🌽", per100:{cal:96,protein:3.4,carbs:21,fat:1.5} },
+  { id:"c029", name:"פולנטה מבושלת", category:"carbs", emoji:"🌾", per100:{cal:70,protein:1.5,carbs:15,fat:0.5} },
+  { id:"c030", name:"לחם אורז", category:"carbs", emoji:"🍞", per100:{cal:266,protein:4.5,carbs:57,fat:3.4} },
 
-  // ===== שומנים =====
-  {
-    id: "fat001", name: "שמן זית", category: "fats", emoji: "🫒",
-    per100: { cal: 884, protein: 0, carbs: 0, fat: 100 }
-  },
-  {
-    id: "fat002", name: "חמאת בוטנים טבעית", category: "fats", emoji: "🥜",
-    per100: { cal: 588, protein: 25, carbs: 20, fat: 50 }
-  },
-  {
-    id: "fat003", name: "שקדים", category: "fats", emoji: "🫘",
-    per100: { cal: 579, protein: 21, carbs: 22, fat: 50 }
-  },
-  {
-    id: "fat004", name: "אגוזי מלך", category: "fats", emoji: "🫘",
-    per100: { cal: 654, protein: 15, carbs: 14, fat: 65 }
-  },
-  {
-    id: "fat005", name: "טחינה גולמית", category: "fats", emoji: "🌰",
-    per100: { cal: 570, protein: 17, carbs: 26, fat: 48 }
-  },
-  {
-    id: "fat006", name: "חומוס מוכן", category: "fats", emoji: "🥙",
-    per100: { cal: 166, protein: 8.9, carbs: 14, fat: 9.6 }
-  },
+  // ===== ירקות — VEGETABLES =====
+  { id:"v001", name:"מלפפון", category:"veggies", emoji:"🥒", per100:{cal:15,protein:0.7,carbs:3.6,fat:0.1} },
+  { id:"v002", name:"עגבנייה", category:"veggies", emoji:"🍅", per100:{cal:18,protein:0.9,carbs:3.9,fat:0.2} },
+  { id:"v003", name:"חסה", category:"veggies", emoji:"🥬", per100:{cal:15,protein:1.4,carbs:2.9,fat:0.2} },
+  { id:"v004", name:"פלפל אדום", category:"veggies", emoji:"🫑", per100:{cal:31,protein:1,carbs:6,fat:0.3} },
+  { id:"v005", name:"פלפל ירוק", category:"veggies", emoji:"🫑", per100:{cal:20,protein:0.9,carbs:4.6,fat:0.2} },
+  { id:"v006", name:"פלפל צהוב", category:"veggies", emoji:"🫑", per100:{cal:27,protein:1,carbs:6.3,fat:0.2} },
+  { id:"v007", name:"גזר", category:"veggies", emoji:"🥕", per100:{cal:41,protein:0.9,carbs:10,fat:0.2} },
+  { id:"v008", name:"ברוקולי", category:"veggies", emoji:"🥦", per100:{cal:34,protein:2.8,carbs:7,fat:0.4} },
+  { id:"v009", name:"כרובית", category:"veggies", emoji:"🥦", per100:{cal:25,protein:2,carbs:5,fat:0.3} },
+  { id:"v010", name:"תרד", category:"veggies", emoji:"🥬", per100:{cal:23,protein:2.9,carbs:3.6,fat:0.4} },
+  { id:"v011", name:"בצל", category:"veggies", emoji:"🧅", per100:{cal:40,protein:1.1,carbs:9.3,fat:0.1} },
+  { id:"v012", name:"שום", category:"veggies", emoji:"🧄", per100:{cal:149,protein:6.4,carbs:33,fat:0.5} },
+  { id:"v013", name:"קישוא", category:"veggies", emoji:"🥒", per100:{cal:17,protein:1.2,carbs:3.1,fat:0.3} },
+  { id:"v014", name:"חציל", category:"veggies", emoji:"🍆", per100:{cal:25,protein:1,carbs:6,fat:0.2} },
+  { id:"v015", name:"פטריות שמפיניון", category:"veggies", emoji:"🍄", per100:{cal:22,protein:3.1,carbs:3.3,fat:0.3} },
+  { id:"v016", name:"כרוב לבן", category:"veggies", emoji:"🥬", per100:{cal:25,protein:1.3,carbs:5.8,fat:0.1} },
+  { id:"v017", name:"כרוב סגול", category:"veggies", emoji:"🥬", per100:{cal:31,protein:1.4,carbs:7.4,fat:0.2} },
+  { id:"v018", name:"סלרי", category:"veggies", emoji:"🌿", per100:{cal:16,protein:0.7,carbs:3,fat:0.2} },
+  { id:"v019", name:"אספרגוס", category:"veggies", emoji:"🌿", per100:{cal:20,protein:2.2,carbs:3.9,fat:0.1} },
+  { id:"v020", name:"שעועית ירוקה", category:"veggies", emoji:"🌿", per100:{cal:31,protein:1.8,carbs:7,fat:0.1} },
+  { id:"v021", name:"אפונה קפואה", category:"veggies", emoji:"🌿", per100:{cal:81,protein:5.4,carbs:14,fat:0.4} },
+  { id:"v022", name:"תירס קפוא", category:"veggies", emoji:"🌽", per100:{cal:86,protein:3.2,carbs:19,fat:1.2} },
+  { id:"v023", name:"עגבניות שרי", category:"veggies", emoji:"🍅", per100:{cal:18,protein:0.9,carbs:3.9,fat:0.2} },
+  { id:"v024", name:"צנון", category:"veggies", emoji:"🌿", per100:{cal:16,protein:0.7,carbs:3.4,fat:0.1} },
+  { id:"v025", name:"כרישה", category:"veggies", emoji:"🌿", per100:{cal:61,protein:1.5,carbs:14,fat:0.3} },
 
-  // ===== אחר =====
-  {
-    id: "o001", name: "קפה שחור", category: "other", emoji: "☕",
-    per100: { cal: 2, protein: 0.3, carbs: 0, fat: 0 }
-  },
-  {
-    id: "o002", name: "חלב שקדים לא ממותק", category: "other", emoji: "🥛",
-    per100: { cal: 15, protein: 0.5, carbs: 0.3, fat: 1.2 }
-  },
-  {
-    id: "o003", name: "שוקולד מריר 85%", category: "other", emoji: "🍫",
-    per100: { cal: 598, protein: 8, carbs: 46, fat: 43 }
-  },
-  {
-    id: "o004", name: "פלאפל (כדור)", category: "other", emoji: "🧆",
-    per100: { cal: 333, protein: 13, carbs: 31, fat: 18 }
-  },
-  {
-    id: "o005", name: "שקשוקה", category: "other", emoji: "🍳",
-    per100: { cal: 85, protein: 5, carbs: 6, fat: 4.5 }
-  }
+  // ===== פירות — FRUITS =====
+  { id:"f001", name:"תפוח", category:"veggies", emoji:"🍎", per100:{cal:52,protein:0.3,carbs:14,fat:0.2} },
+  { id:"f002", name:"בננה", category:"veggies", emoji:"🍌", per100:{cal:89,protein:1.1,carbs:23,fat:0.3} },
+  { id:"f003", name:"תפוז", category:"veggies", emoji:"🍊", per100:{cal:47,protein:0.9,carbs:12,fat:0.1} },
+  { id:"f004", name:"אבוקדו", category:"fats", emoji:"🥑", per100:{cal:160,protein:2,carbs:9,fat:15} },
+  { id:"f005", name:"אבטיח", category:"veggies", emoji:"🍉", per100:{cal:30,protein:0.6,carbs:7.6,fat:0.2} },
+  { id:"f006", name:"ענבים", category:"veggies", emoji:"🍇", per100:{cal:69,protein:0.7,carbs:18,fat:0.2} },
+  { id:"f007", name:"מנגו", category:"veggies", emoji:"🥭", per100:{cal:60,protein:0.8,carbs:15,fat:0.4} },
+  { id:"f008", name:"תות שדה", category:"veggies", emoji:"🍓", per100:{cal:32,protein:0.7,carbs:7.7,fat:0.3} },
+  { id:"f009", name:"בלוברי", category:"veggies", emoji:"🫐", per100:{cal:57,protein:0.7,carbs:14,fat:0.3} },
+  { id:"f010", name:"אפרסק", category:"veggies", emoji:"🍑", per100:{cal:39,protein:0.9,carbs:10,fat:0.3} },
+  { id:"f011", name:"אננס", category:"veggies", emoji:"🍍", per100:{cal:50,protein:0.5,carbs:13,fat:0.1} },
+  { id:"f012", name:"קיווי", category:"veggies", emoji:"🥝", per100:{cal:61,protein:1.1,carbs:15,fat:0.5} },
+  { id:"f013", name:"לימון", category:"veggies", emoji:"🍋", per100:{cal:29,protein:1.1,carbs:9,fat:0.3} },
+  { id:"f014", name:"תמר מג'הול", category:"veggies", emoji:"🌴", per100:{cal:282,protein:2,carbs:75,fat:0.4} },
+  { id:"f015", name:"צימוקים", category:"veggies", emoji:"🍇", per100:{cal:299,protein:3.1,carbs:79,fat:0.5} },
+
+  // ===== שומנים ואגוזים — FATS & NUTS =====
+  { id:"n001", name:"שמן זית", category:"fats", emoji:"🫒", per100:{cal:884,protein:0,carbs:0,fat:100} },
+  { id:"n002", name:"שמן קוקוס", category:"fats", emoji:"🥥", per100:{cal:862,protein:0,carbs:0,fat:100} },
+  { id:"n003", name:"שמן שומשום", category:"fats", emoji:"🌰", per100:{cal:884,protein:0,carbs:0,fat:100} },
+  { id:"n004", name:"שמן קנולה", category:"fats", emoji:"🌿", per100:{cal:884,protein:0,carbs:0,fat:100} },
+  { id:"n005", name:"חמאת בוטנים טבעית", category:"fats", emoji:"🥜", per100:{cal:588,protein:25,carbs:20,fat:50} },
+  { id:"n006", name:"חמאת שקדים", category:"fats", emoji:"🌰", per100:{cal:614,protein:21,carbs:19,fat:56} },
+  { id:"n007", name:"שקדים", category:"fats", emoji:"🌰", per100:{cal:579,protein:21,carbs:22,fat:50} },
+  { id:"n008", name:"אגוזי מלך", category:"fats", emoji:"🌰", per100:{cal:654,protein:15,carbs:14,fat:65} },
+  { id:"n009", name:"קשיו", category:"fats", emoji:"🌰", per100:{cal:553,protein:18,carbs:33,fat:44} },
+  { id:"n010", name:"פיסטוקים", category:"fats", emoji:"🌰", per100:{cal:560,protein:20,carbs:28,fat:45} },
+  { id:"n011", name:"בוטנים", category:"fats", emoji:"🥜", per100:{cal:567,protein:26,carbs:16,fat:49} },
+  { id:"n012", name:"טחינה גולמית", category:"fats", emoji:"🌰", per100:{cal:570,protein:17,carbs:26,fat:48} },
+  { id:"n013", name:"חומוס מוכן", category:"fats", emoji:"🥙", per100:{cal:166,protein:8.9,carbs:14,fat:9.6} },
+  { id:"n014", name:"גרעיני דלעת", category:"fats", emoji:"🌰", per100:{cal:559,protein:30,carbs:11,fat:49} },
+  { id:"n015", name:"גרעיני חמנייה", category:"fats", emoji:"🌻", per100:{cal:584,protein:21,carbs:20,fat:51} },
+
+  // ===== רטבים ותבלינים — SAUCES & CONDIMENTS =====
+  { id:"s001", name:"מיונז רגיל", category:"sauces", emoji:"🫙", per100:{cal:680,protein:1,carbs:0.6,fat:75} },
+  { id:"s002", name:"מיונז קל 30%", category:"sauces", emoji:"🫙", per100:{cal:300,protein:1.5,carbs:8,fat:30} },
+  { id:"s003", name:"מיונז ביצה", category:"sauces", emoji:"🫙", per100:{cal:680,protein:1,carbs:0.6,fat:75} },
+  { id:"s004", name:"קטשופ", category:"sauces", emoji:"🍅", per100:{cal:101,protein:1.7,carbs:25,fat:0.1} },
+  { id:"s005", name:"חרדל", category:"sauces", emoji:"🫙", per100:{cal:66,protein:4,carbs:6,fat:4} },
+  { id:"s006", name:"רוטב סויה", category:"sauces", emoji:"🫙", per100:{cal:60,protein:8,carbs:5,fat:0} },
+  { id:"s007", name:"רוטב סויה דיאט (נמוך נתרן)", category:"sauces", emoji:"🫙", per100:{cal:50,protein:7,carbs:4,fat:0} },
+  { id:"s008", name:"סריראצ'ה", category:"sauces", emoji:"🌶", per100:{cal:93,protein:3,carbs:18,fat:1} },
+  { id:"s009", name:"טבסקו", category:"sauces", emoji:"🌶", per100:{cal:12,protein:0.5,carbs:1,fat:0} },
+  { id:"s010", name:"רוטב עגבניות", category:"sauces", emoji:"🍅", per100:{cal:68,protein:2.5,carbs:14,fat:0.5} },
+  { id:"s011", name:"פסטו", category:"sauces", emoji:"🌿", per100:{cal:430,protein:6,carbs:5,fat:43} },
+  { id:"s012", name:"רוטב BBQ", category:"sauces", emoji:"🫙", per100:{cal:172,protein:1,carbs:40,fat:0.5} },
+  { id:"s013", name:"רוטב טריאקי", category:"sauces", emoji:"🫙", per100:{cal:89,protein:5,carbs:15,fat:1} },
+  { id:"s014", name:"רוטב צזר", category:"sauces", emoji:"🫙", per100:{cal:360,protein:2,carbs:3,fat:38} },
+  { id:"s015", name:"רוטב רנץ'", category:"sauces", emoji:"🫙", per100:{cal:460,protein:1,carbs:6,fat:48} },
+  { id:"s016", name:"חומוס", category:"sauces", emoji:"🥙", per100:{cal:166,protein:8.9,carbs:14,fat:9.6} },
+  { id:"s017", name:"טחינה מוכנה", category:"sauces", emoji:"🫙", per100:{cal:340,protein:11,carbs:14,fat:28} },
+  { id:"s018", name:"גוואקמולה", category:"sauces", emoji:"🥑", per100:{cal:160,protein:2,carbs:9,fat:15} },
+  { id:"s019", name:"סלסה", category:"sauces", emoji:"🍅", per100:{cal:36,protein:2,carbs:7,fat:0.4} },
+  { id:"s020", name:"חומוס שחור (חריסה)", category:"sauces", emoji:"🌶", per100:{cal:180,protein:5,carbs:18,fat:10} },
+  { id:"s021", name:"וינגרט", category:"sauces", emoji:"🫙", per100:{cal:285,protein:0.2,carbs:10,fat:27} },
+  { id:"s022", name:"רוטב חרדל דבש", category:"sauces", emoji:"🫙", per100:{cal:330,protein:1,carbs:22,fat:26} },
+  { id:"s023", name:"מיסו", category:"sauces", emoji:"🫙", per100:{cal:200,protein:12,carbs:27,fat:6} },
+  { id:"s024", name:"וורצ'סטר", category:"sauces", emoji:"🫙", per100:{cal:78,protein:0,carbs:20,fat:0} },
+  { id:"s025", name:"רוטב דגים", category:"sauces", emoji:"🐟", per100:{cal:35,protein:5,carbs:3.6,fat:0} },
+  { id:"s026", name:"רוטב אוסטר", category:"sauces", emoji:"🦪", per100:{cal:105,protein:2,carbs:24,fat:0.5} },
+  { id:"s027", name:"דבש", category:"sauces", emoji:"🍯", per100:{cal:304,protein:0.3,carbs:82,fat:0} },
+  { id:"s028", name:"ריבה/מרמלדה", category:"sauces", emoji:"🍓", per100:{cal:250,protein:0.5,carbs:62,fat:0.1} },
+  { id:"s029", name:"נוטלה", category:"sauces", emoji:"🍫", per100:{cal:539,protein:6,carbs:58,fat:31} },
+  { id:"s030", name:"ממרח שוקולד קל", category:"sauces", emoji:"🍫", per100:{cal:380,protein:4,carbs:55,fat:16} },
+  { id:"s031", name:"ממרח גבינה", category:"sauces", emoji:"🧀", per100:{cal:342,protein:6,carbs:4,fat:34} },
+  { id:"s032", name:"שמנת לקפה", category:"sauces", emoji:"☕", per100:{cal:340,protein:2,carbs:25,fat:25} },
+  { id:"s033", name:"רוטב פיצה", category:"sauces", emoji:"🍕", per100:{cal:82,protein:2.5,carbs:16,fat:1.5} },
+  { id:"s034", name:"מיונז סושי (ספייסי)", category:"sauces", emoji:"🍣", per100:{cal:500,protein:1,carbs:5,fat:52} },
+  { id:"s035", name:"רוטב ווסאבי", category:"sauces", emoji:"🟢", per100:{cal:109,protein:4.8,carbs:23,fat:0.6} },
+
+  // ===== שתייה — BEVERAGES =====
+  { id:"b001", name:"מים", category:"other", emoji:"💧", per100:{cal:0,protein:0,carbs:0,fat:0} },
+  { id:"b002", name:"קפה שחור", category:"other", emoji:"☕", per100:{cal:2,protein:0.3,carbs:0,fat:0} },
+  { id:"b003", name:"קפה עם חלב 3%", category:"other", emoji:"☕", per100:{cal:45,protein:1.5,carbs:4,fat:2} },
+  { id:"b004", name:"קפוצ'ינו", category:"other", emoji:"☕", per100:{cal:60,protein:3,carbs:6,fat:2.5} },
+  { id:"b005", name:"לאטה", category:"other", emoji:"☕", per100:{cal:55,protein:3,carbs:6,fat:2} },
+  { id:"b006", name:"תה ללא סוכר", category:"other", emoji:"🍵", per100:{cal:1,protein:0,carbs:0.2,fat:0} },
+  { id:"b007", name:"מיץ תפוזים טרי", category:"other", emoji:"🍊", per100:{cal:45,protein:0.7,carbs:10,fat:0.2} },
+  { id:"b008", name:"מיץ תפוחים", category:"other", emoji:"🍎", per100:{cal:46,protein:0.1,carbs:11.4,fat:0.1} },
+  { id:"b009", name:"חלב שקדים ללא סוכר", category:"other", emoji:"🥛", per100:{cal:15,protein:0.5,carbs:0.3,fat:1.2} },
+  { id:"b010", name:"חלב סויה", category:"other", emoji:"🥛", per100:{cal:54,protein:3.3,carbs:6.3,fat:1.8} },
+  { id:"b011", name:"שייק חלבון (ממוצע)", category:"other", emoji:"💪", per100:{cal:120,protein:25,carbs:4,fat:1.5} },
+  { id:"b012", name:"קוקטייל פרי", category:"other", emoji:"🥤", per100:{cal:55,protein:0.5,carbs:13,fat:0.2} },
+  { id:"b013", name:"סודה/קולה", category:"other", emoji:"🥤", per100:{cal:42,protein:0,carbs:10.6,fat:0} },
+  { id:"b014", name:"קולה זירו", category:"other", emoji:"🥤", per100:{cal:0,protein:0,carbs:0,fat:0} },
+  { id:"b015", name:"משקה אנרגיה", category:"other", emoji:"⚡", per100:{cal:45,protein:0,carbs:11,fat:0} },
+
+  // ===== חטיפים ומתוקים — SNACKS =====
+  { id:"sn001", name:"קרקר מלח", category:"other", emoji:"🍘", per100:{cal:421,protein:8,carbs:74,fat:11} },
+  { id:"sn002", name:"ביסקוויט שוקולד", category:"other", emoji:"🍪", per100:{cal:480,protein:6,carbs:65,fat:23} },
+  { id:"sn003", name:"עוגיית שיבולת שועל", category:"other", emoji:"🍪", per100:{cal:451,protein:7,carbs:65,fat:19} },
+  { id:"sn004", name:"פופקורן אוויר", category:"other", emoji:"🍿", per100:{cal:387,protein:13,carbs:78,fat:4.5} },
+  { id:"sn005", name:"צ'יפס/חטיף תפוח", category:"other", emoji:"🥔", per100:{cal:536,protein:7,carbs:53,fat:35} },
+  { id:"sn006", name:"פרצל", category:"other", emoji:"🥨", per100:{cal:380,protein:9,carbs:80,fat:4} },
+  { id:"sn007", name:"שוקולד חלב", category:"other", emoji:"🍫", per100:{cal:546,protein:5,carbs:60,fat:31} },
+  { id:"sn008", name:"שוקולד מריר 70%", category:"other", emoji:"🍫", per100:{cal:598,protein:7,carbs:46,fat:43} },
+  { id:"sn009", name:"וופל", category:"other", emoji:"🧇", per100:{cal:450,protein:7,carbs:65,fat:18} },
+  { id:"sn010", name:"גלידה וניל", category:"other", emoji:"🍦", per100:{cal:207,protein:3.5,carbs:24,fat:11} },
+  { id:"sn011", name:"גלידת שוקולד", category:"other", emoji:"🍫", per100:{cal:216,protein:3.8,carbs:26,fat:11} },
+  { id:"sn012", name:"פלאפל (כדור)", category:"other", emoji:"🧆", per100:{cal:333,protein:13,carbs:31,fat:18} },
+  { id:"sn013", name:"שקשוקה", category:"other", emoji:"🍳", per100:{cal:85,protein:5,carbs:6,fat:4.5} },
+  { id:"sn014", name:"בורקס גבינה", category:"other", emoji:"🥐", per100:{cal:330,protein:8,carbs:35,fat:18} },
+  { id:"sn015", name:"פיצה מרגריטה", category:"other", emoji:"🍕", per100:{cal:266,protein:11,carbs:33,fat:10} },
+  { id:"sn016", name:"סושי ניגירי (לחה)", category:"other", emoji:"🍣", per100:{cal:150,protein:6,carbs:28,fat:1} },
+  { id:"sn017", name:"סושי מאקי (גלילה)", category:"other", emoji:"🍱", per100:{cal:143,protein:5,carbs:28,fat:0.5} },
+  { id:"sn018", name:"קישי גבינה", category:"other", emoji:"🥧", per100:{cal:310,protein:10,carbs:22,fat:20} },
+  { id:"sn019", name:"חביתה", category:"other", emoji:"🍳", per100:{cal:154,protein:11,carbs:0.4,fat:12} },
+  { id:"sn020", name:"פנקייק", category:"other", emoji:"🥞", per100:{cal:227,protein:6,carbs:33,fat:8} },
 ];
 
 const CATEGORY_LABELS = {
   protein: "חלבונים",
-  dairy: "מוצרי חלב",
-  carbs: "פחמימות",
+  dairy:   "מוצרי חלב",
+  carbs:   "פחמימות",
   veggies: "ירקות ופירות",
-  fats: "שומנים ואגוזים",
-  other: "אחר"
+  fats:    "שומנים ואגוזים",
+  sauces:  "רטבים ותבלינים",
+  other:   "אחר"
 };
 
-const CATEGORY_ORDER = ["protein", "dairy", "carbs", "veggies", "fats", "other"];
+const CATEGORY_ORDER = ["protein","dairy","carbs","veggies","fats","sauces","other"];

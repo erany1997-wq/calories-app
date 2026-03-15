@@ -490,6 +490,16 @@ const HE_TO_EN = {
   // מותגים ישראלים
   "סיקווט": "seequet biscuit", "אסם": "osem snack",
   "תנובה": "dairy", "שטראוס": "strauss",
+  // רטבים נוספים
+  "מיונז סושי": "spicy mayo sushi",
+  "רוטב וסאבי": "wasabi sauce",
+  "מיסו": "miso paste",
+  "רוטב אוסטר": "oyster sauce",
+  "רוטב דגים": "fish sauce",
+  "חריסה": "harissa",
+  "עינביות": "cranberry sauce",
+  "ממרח": "spread",
+  "שמן שומשום": "sesame oil",
 };
 
 function translateToEnglish(hebrewQuery) {
@@ -654,7 +664,10 @@ async function renderSearchResults(q) {
   if (!q || q.length < 2) { container.innerHTML = ""; return; }
 
   // Local results instantly
-  const localResults = getAllFoods().filter(f => f.name.includes(q)).slice(0, 4);
+  const localResults = getAllFoods().filter(f => 
+    f.name.includes(q) || 
+    (q.length >= 3 && f.name.toLowerCase().includes(q.toLowerCase()))
+  ).slice(0, 6);
   container.innerHTML = "";
   if (localResults.length > 0) renderLocalResults(localResults, container);
 
