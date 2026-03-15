@@ -184,6 +184,12 @@ function saveProfile() {
 function initDashboard() {
   document.getElementById("btn-to-settings").addEventListener("click", () => navigateTo("settings"));
   document.getElementById("btn-open-add").addEventListener("click", () => openModal("modal-add-food"));
+
+  // Weight save button - wire here so it's always available
+  document.getElementById("btn-dash-weight-save")?.addEventListener("click", logWeightFromDash);
+  document.getElementById("dash-weight-input")?.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") logWeightFromDash();
+  });
 }
 
 function refreshDashboard() {
@@ -1467,17 +1473,6 @@ document.addEventListener("DOMContentLoaded", () => {
 // ============================================================
 
 function initWeightTracking() {
-  // Dashboard weight input
-  const dashInput = document.getElementById("dash-weight-input");
-  if (dashInput && profile) dashInput.value = "";
-
-  document.getElementById("btn-dash-weight-save")?.addEventListener("click", logWeightFromDash);
-
-  // Allow Enter key
-  dashInput?.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") logWeightFromDash();
-  });
-
   refreshWeightDisplay();
 }
 
