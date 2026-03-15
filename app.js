@@ -202,19 +202,14 @@ function initDarkMode() {
   if (saved === "true") {
     document.documentElement.setAttribute("data-theme", "dark");
   }
-  // Create dark mode button dynamically and add to header
-  const headerRight = document.querySelector(".header-right");
-  const isDarkNow = localStorage.getItem("darkMode") === "true";
-  if (headerRight && !document.getElementById("btn-dark-toggle")) {
-    const btn = document.createElement("button");
-    btn.id = "btn-dark-toggle";
-    btn.className = "icon-btn";
-    btn.title = "מצב לילה";
-    btn.innerHTML = isDarkNow ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
-    btn.style.cssText = "font-size:16px;";
-    btn.onclick = toggleDarkMode;
-    headerRight.insertBefore(btn, headerRight.firstChild);
-  }
+  updateDarkBtn();
+}
+
+function updateDarkBtn() {
+  const btn = document.getElementById("btn-dark-toggle");
+  if (!btn) return;
+  const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+  btn.innerHTML = isDark ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
 }
 
 function toggleDarkMode() {
@@ -222,17 +217,13 @@ function toggleDarkMode() {
   if (isDark) {
     document.documentElement.removeAttribute("data-theme");
     localStorage.setItem("darkMode", "false");
-    const btn = document.getElementById("btn-dark-toggle");
-    if (btn) btn.innerHTML = '<i class="fa-solid fa-moon"></i>';
   } else {
     document.documentElement.setAttribute("data-theme", "dark");
     localStorage.setItem("darkMode", "true");
-    const btn = document.getElementById("btn-dark-toggle");
-    if (btn) btn.innerHTML = '<i class="fa-solid fa-sun"></i>';
   }
+  updateDarkBtn();
   if (document.getElementById("screen-stats")?.classList.contains("active")) {
-    renderCharts();
-    renderWeightChart();
+    renderCharts(); renderWeightChart();
   }
 }
 
@@ -1347,14 +1338,14 @@ function renderCharts() {
         datasets: [{
           label: "קלוריות",
           data: calData,
-          backgroundColor: calData.map(v => v > target ? "rgba(244,63,94,.7)" : v > target * 0.8 ? "rgba(251,191,36,.7)" : "rgba(0,245,196,.7)"),
+          backgroundColor: calData.map(v => v > target ? "rgba(239,68,68,.75)" : v > target * 0.8 ? "rgba(245,158,11,.75)" : "rgba(124,58,237,.7)"),
           borderRadius: 8,
           borderSkipped: false,
         }, {
           label: "יעד",
           data: Array(7).fill(target),
           type: "line",
-          borderColor: "rgba(14,165,233,.6)",
+          borderColor: "rgba(124,58,237,.5)",
           borderWidth: 2,
           borderDash: [6, 4],
           pointRadius: 0,
@@ -1376,14 +1367,14 @@ function renderCharts() {
         datasets: [{
           label: "כוסות",
           data: waterData,
-          backgroundColor: "rgba(14,165,233,.6)",
+          backgroundColor: "rgba(14,165,233,.7)",
           borderRadius: 8,
           borderSkipped: false,
         }, {
           label: "יעד",
           data: Array(7).fill(waterGoal),
           type: "line",
-          borderColor: "rgba(0,245,196,.6)",
+          borderColor: "rgba(124,58,237,.5)",
           borderWidth: 2,
           borderDash: [6, 4],
           pointRadius: 0,
@@ -1409,7 +1400,7 @@ function renderCharts() {
         labels: ["חלבון", "פחמימות", "שומן"],
         datasets: [{
           data: [Math.round(p), Math.round(c), Math.round(f)],
-          backgroundColor: ["rgba(0,245,196,.8)", "rgba(251,191,36,.8)", "rgba(244,63,94,.8)"],
+          backgroundColor: ["rgba(239,68,68,.85)", "rgba(59,130,246,.85)", "rgba(245,158,11,.85)"],
           borderWidth: 0,
           hoverOffset: 8,
         }]
@@ -1422,9 +1413,9 @@ function renderCharts() {
             callbacks: {
               label: ctx => ` ${ctx.label}: ${ctx.raw}g`
             },
-            backgroundColor: "rgba(8,14,30,.9)",
-            titleColor: "#e8f4ff", bodyColor: "#7a9bbf",
-            borderColor: "rgba(0,245,196,.2)", borderWidth: 1,
+            backgroundColor: "rgba(26,16,48,.95)",
+            titleColor: "#F3EEFF", bodyColor: "#9181B8",
+            borderColor: "rgba(124,58,237,.25)", borderWidth: 1,
           }
         },
         cutout: "65%",
@@ -1435,8 +1426,8 @@ function renderCharts() {
     const legend = document.getElementById("macro-legend");
     if (legend) {
       legend.innerHTML = [
-        { color: "#00f5c4", label: "חלבון", val: Math.round(p) + "g" },
-        { color: "#fbbf24", label: "פחמימות", val: Math.round(c) + "g" },
+        { color: "#EF4444", label: "חלבון", val: Math.round(p) + "g" },
+        { color: "#3B82F6", label: "פחמימות", val: Math.round(c) + "g" },
         { color: "#f43f5e", label: "שומן", val: Math.round(f) + "g" },
       ].map(l => `
         <div class="legend-item">
