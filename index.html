@@ -103,7 +103,7 @@
         <div class="greeting" id="header-greeting"></div>
       </div>
       <div class="header-right">
-        <button class="icon-btn" id="btn-to-settings" aria-label="הגדרות">⚙</button>
+        <button class="icon-btn" id="btn-to-settings" aria-label="הגדרות"><i class="fa-solid fa-gear"></i></button>
       </div>
     </div>
     <div class="dashboard-scroll">
@@ -112,11 +112,11 @@
         <div class="ring-container">
           <svg class="calorie-ring" viewBox="0 0 200 200">
             <defs>
-              <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#00f5c4"/><stop offset="100%" stop-color="#0ea5e9"/>
+              <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#10B981"/><stop offset="100%" stop-color="#059669"/>
               </linearGradient>
-              <linearGradient id="ringGradientWarn" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#fb923c"/>
+              <linearGradient id="ringGradWarn" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#F59E0B"/><stop offset="100%" stop-color="#D97706"/>
               </linearGradient>
             </defs>
             <circle class="ring-bg" cx="100" cy="100" r="85"/>
@@ -129,9 +129,9 @@
           </div>
         </div>
         <div class="calorie-stats">
-          <div class="stat-pill"><span class="stat-icon">🎯</span><div><div class="stat-val" id="stat-goal">—</div><div class="stat-lbl">יעד</div></div></div>
-          <div class="stat-pill"><span class="stat-icon">🍽</span><div><div class="stat-val" id="stat-eaten">0</div><div class="stat-lbl">נצרך</div></div></div>
-          <div class="stat-pill"><span class="stat-icon">🔥</span><div><div class="stat-val" id="stat-burned">0</div><div class="stat-lbl">נשרף</div></div></div>
+          <div class="stat-pill"><div class="stat-icon goal-icon"><i class="fa-solid fa-bullseye"></i></div><div><div class="stat-val" id="stat-goal">—</div><div class="stat-lbl">יעד</div></div></div>
+          <div class="stat-pill"><div class="stat-icon eaten-icon"><i class="fa-solid fa-utensils"></i></div><div><div class="stat-val" id="stat-eaten">0</div><div class="stat-lbl">נצרך</div></div></div>
+          <div class="stat-pill"><div class="stat-icon burned-icon"><i class="fa-solid fa-fire"></i></div><div><div class="stat-val" id="stat-burned">0</div><div class="stat-lbl">נשרף</div></div></div>
         </div>
       </div>
 
@@ -148,43 +148,54 @@
       <div class="water-card card">
         <div class="water-header">
           <div class="water-title-row">
-            <span class="water-icon-big">💧</span>
+            <div class="water-icon-big"><i class="fa-solid fa-droplet"></i></div>
             <div>
               <div class="water-title">מעקב שתייה</div>
               <div class="water-sub" id="water-sub">0 / 8 כוסות</div>
             </div>
           </div>
-          <div class="water-goal-btn" id="btn-water-goal">⚙</div>
+          <div class="water-goal-btn" id="btn-water-goal"><i class="fa-solid fa-sliders"></i></div>
         </div>
         <div class="water-cups" id="water-cups"></div>
         <div class="water-actions">
-          <button class="btn-water-add" id="btn-water-add">+ כוס</button>
-          <button class="btn-water-reset" id="btn-water-reset">אפס</button>
+          <button class="btn-water-add" id="btn-water-add"><i class="fa-solid fa-plus"></i> כוס</button>
+          <button class="btn-water-reset" id="btn-water-reset"><i class="fa-solid fa-rotate-left"></i> אפס</button>
         </div>
       </div>
 
       <!-- Macros -->
       <div class="macros-row card">
-        <div class="macro">
-          <div class="macro-bar-wrap"><div class="macro-bar protein-bar" id="bar-protein"></div></div>
-          <span class="macro-val" id="val-protein">0g</span>
-          <span class="macro-name">חלבון</span>
-        </div>
-        <div class="macro">
-          <div class="macro-bar-wrap"><div class="macro-bar carb-bar" id="bar-carbs"></div></div>
-          <span class="macro-val" id="val-carbs">0g</span>
-          <span class="macro-name">פחמימות</span>
-        </div>
-        <div class="macro">
-          <div class="macro-bar-wrap"><div class="macro-bar fat-bar" id="bar-fat"></div></div>
-          <span class="macro-val" id="val-fat">0g</span>
-          <span class="macro-name">שומן</span>
+        <div class="macros-grid">
+          <div class="macro-card">
+            <div class="macro-header">
+              <div class="macro-icon protein"><i class="fa-solid fa-drumstick-bite"></i></div>
+              <span class="macro-val" id="val-protein">0g</span>
+            </div>
+            <span class="macro-name">חלבון</span>
+            <div class="macro-bar-wrap"><div class="macro-bar protein-bar" id="bar-protein"></div></div>
+          </div>
+          <div class="macro-card">
+            <div class="macro-header">
+              <div class="macro-icon carbs"><i class="fa-solid fa-bread-slice"></i></div>
+              <span class="macro-val" id="val-carbs">0g</span>
+            </div>
+            <span class="macro-name">פחמימות</span>
+            <div class="macro-bar-wrap"><div class="macro-bar carb-bar" id="bar-carbs"></div></div>
+          </div>
+          <div class="macro-card">
+            <div class="macro-header">
+              <div class="macro-icon fat"><i class="fa-solid fa-droplet"></i></div>
+              <span class="macro-val" id="val-fat">0g</span>
+            </div>
+            <span class="macro-name">שומן</span>
+            <div class="macro-bar-wrap"><div class="macro-bar fat-bar" id="bar-fat"></div></div>
+          </div>
         </div>
       </div>
 
       <!-- Add Food -->
       <button class="btn-add-food" id="btn-open-add">
-        <span class="plus-icon">+</span><span>הוסף אוכל</span>
+        <i class="fa-solid fa-plus"></i><span>הוסף אוכל</span>
       </button>
 
       <!-- Food Log -->
@@ -202,10 +213,10 @@
     </div>
 
     <nav class="bottom-nav">
-      <button class="nav-btn active" data-screen="dashboard"><span class="nav-icon">🏠</span><span>בית</span></button>
-      <button class="nav-btn" data-screen="stats"><span class="nav-icon">📈</span><span>גרפים</span></button>
-      <button class="nav-btn" data-screen="food-db"><span class="nav-icon">🔍</span><span>מזון</span></button>
-      <button class="nav-btn" data-screen="settings"><span class="nav-icon">⚙</span><span>הגדרות</span></button>
+      <button class="nav-btn active" data-screen="dashboard"><i class="fa-solid fa-house"></i><span>בית</span></button>
+      <button class="nav-btn" data-screen="stats"><i class="fa-solid fa-chart-line"></i><span>גרפים</span></button>
+      <button class="nav-btn" data-screen="food-db"><i class="fa-solid fa-magnifying-glass"></i><span>מזון</span></button>
+      <button class="nav-btn" data-screen="settings"><i class="fa-solid fa-gear"></i><span>הגדרות</span></button>
     </nav>
   </div>
 
@@ -247,10 +258,10 @@
       <div class="stats-summary card" id="stats-summary"></div>
     </div>
     <nav class="bottom-nav">
-      <button class="nav-btn" data-screen="dashboard"><span class="nav-icon">🏠</span><span>בית</span></button>
-      <button class="nav-btn active" data-screen="stats"><span class="nav-icon">📈</span><span>גרפים</span></button>
-      <button class="nav-btn" data-screen="food-db"><span class="nav-icon">🔍</span><span>מזון</span></button>
-      <button class="nav-btn" data-screen="settings"><span class="nav-icon">⚙</span><span>הגדרות</span></button>
+      <button class="nav-btn" data-screen="dashboard"><i class="fa-solid fa-house"></i><span>בית</span></button>
+      <button class="nav-btn active" data-screen="stats"><i class="fa-solid fa-chart-line"></i><span>גרפים</span></button>
+      <button class="nav-btn" data-screen="food-db"><i class="fa-solid fa-magnifying-glass"></i><span>מזון</span></button>
+      <button class="nav-btn" data-screen="settings"><i class="fa-solid fa-gear"></i><span>הגדרות</span></button>
     </nav>
   </div>
 
@@ -258,15 +269,15 @@
   <div id="screen-food-db" class="screen">
     <div class="app-header">
       <h2 class="screen-title">מאגר מזון</h2>
-      <button class="icon-btn" id="btn-add-custom-food">+</button>
+      <button class="icon-btn" id="btn-add-custom-food"><i class="fa-solid fa-plus"></i></button>
     </div>
     <div class="search-wrap"><input type="search" id="db-search" placeholder="חפש מזון..."></div>
     <div class="food-db-list" id="food-db-list"></div>
     <nav class="bottom-nav">
-      <button class="nav-btn" data-screen="dashboard"><span class="nav-icon">🏠</span><span>בית</span></button>
-      <button class="nav-btn" data-screen="stats"><span class="nav-icon">📈</span><span>גרפים</span></button>
-      <button class="nav-btn active" data-screen="food-db"><span class="nav-icon">🔍</span><span>מזון</span></button>
-      <button class="nav-btn" data-screen="settings"><span class="nav-icon">⚙</span><span>הגדרות</span></button>
+      <button class="nav-btn" data-screen="dashboard"><i class="fa-solid fa-house"></i><span>בית</span></button>
+      <button class="nav-btn" data-screen="stats"><i class="fa-solid fa-chart-line"></i><span>גרפים</span></button>
+      <button class="nav-btn active" data-screen="food-db"><i class="fa-solid fa-magnifying-glass"></i><span>מזון</span></button>
+      <button class="nav-btn" data-screen="settings"><i class="fa-solid fa-gear"></i><span>הגדרות</span></button>
     </nav>
   </div>
 
@@ -335,10 +346,10 @@
       </div>
     </div>
     <nav class="bottom-nav">
-      <button class="nav-btn" data-screen="dashboard"><span class="nav-icon">🏠</span><span>בית</span></button>
-      <button class="nav-btn" data-screen="stats"><span class="nav-icon">📈</span><span>גרפים</span></button>
-      <button class="nav-btn" data-screen="food-db"><span class="nav-icon">🔍</span><span>מזון</span></button>
-      <button class="nav-btn active" data-screen="settings"><span class="nav-icon">⚙</span><span>הגדרות</span></button>
+      <button class="nav-btn" data-screen="dashboard"><i class="fa-solid fa-house"></i><span>בית</span></button>
+      <button class="nav-btn" data-screen="stats"><i class="fa-solid fa-chart-line"></i><span>גרפים</span></button>
+      <button class="nav-btn" data-screen="food-db"><i class="fa-solid fa-magnifying-glass"></i><span>מזון</span></button>
+      <button class="nav-btn active" data-screen="settings"><i class="fa-solid fa-gear"></i><span>הגדרות</span></button>
     </nav>
   </div>
 

@@ -305,7 +305,7 @@ function renderFoodLog() {
     el.className = "food-item";
     el.dataset.id = item.id;
     el.innerHTML = `
-      <div class="food-item-icon">${item.emoji || "🍽"}</div>
+      <div class="food-item-icon"><i class="fa-solid fa-bowl-food"></i></div>
       <div class="food-item-info">
         <div class="food-item-name">${item.name}</div>
         <div class="food-item-meta">${item.unitLabel || item.amount+'ג\''} · חלבון: ${Math.round(item.protein||0)}g · פחמ': ${Math.round(item.carbs||0)}g · שומן: ${Math.round(item.fat||0)}g</div>
@@ -912,10 +912,10 @@ function updatePortionPreview() {
   }
 
   document.getElementById("portion-preview").innerHTML = `
-    <div style="font-size:38px;font-weight:700;color:var(--neon);font-family:var(--font-mono)">${cal}</div>
-    <div style="font-size:13px;color:var(--text2);margin-top:4px">קק"ל</div>
-    <div style="font-size:12px;color:var(--text3);margin-top:8px">חלבון: ${protein}g · פחמ': ${carbs}g · שומן: ${fat}g</div>
-    <div style="font-size:11px;color:var(--text3);margin-top:4px">${Math.round(grams)}ג' סה"כ</div>`;
+    <div style="font-size:40px;font-weight:500;color:var(--accent);font-family:var(--font-mono)">${cal}</div>
+    <div style="font-size:12px;color:var(--text-t);margin-top:4px;font-family:var(--font-b)">קק"ל</div>
+    <div style="font-size:12px;color:var(--text-s);margin-top:8px">חלבון: ${protein}g · פחמ': ${carbs}g · שומן: ${fat}g</div>
+    <div style="font-size:11px;color:var(--text-t);margin-top:4px">${Math.round(grams)}ג' סה"כ</div>`;
 }
 
 function confirmPortion() {
@@ -1175,18 +1175,16 @@ function registerSW() {
 // MOTIVATION MESSAGES
 // ============================================================
 const MOTIVATIONS = [
-  { icon: "💪", text: "כוח הוא בנייה של הרגלים!", sub: "כל ארוחה שאתה עוקב אחריה היא צעד קדימה" },
-  { icon: "🔥", text: "אתה שורף את זה!", sub: "העקביות היא הסוד לתוצאות אמיתיות" },
-  { icon: "🎯", text: "יעד ברור = הצלחה בטוחה", sub: "מה שנמדד — משתפר. המשך כך!" },
-  { icon: "🌱", text: "כל יום הוא הזדמנות חדשה", sub: "לא משנה מה היה אתמול, היום חדש" },
-  { icon: "⚡", text: "אנרגיה מתחילה מהצלחה", sub: "גוף שמזינים נכון — ביצועים גבוהים יותר" },
-  { icon: "🏆", text: "אלופים נבנים ביום יום", sub: "כל כוס מים, כל ארוחה — זה נחשב!" },
-  { icon: "🌊", text: "זרום עם ההתקדמות שלך", sub: "תהליך איטי ועקבי עולה על ספרינט קצר" },
-  { icon: "✨", text: "אתה יותר חזק ממה שאתה חושב", sub: "הגוף שלך מסוגל לדברים מדהימים" },
-  { icon: "🎶", text: "מצא את הקצב שלך", sub: "תזונה טובה היא מוזיקה לגוף" },
-  { icon: "🚀", text: "מוכן להמריא היום?", sub: "התדלק נכון ותגיע לאן שאתה רוצה" },
-  { icon: "🧠", text: "מוח חד מתחיל בתזונה נכונה", sub: "מה שאוכלים משפיע על איך שחושבים" },
-  { icon: "❤️", text: "תאהב את הגוף שלך", sub: "כבד אותו בכל ביס שאתה בוחר" },
+  { icon: "fa-dumbbell", text: "כוח הוא בנייה של הרגלים!", sub: "כל ארוחה שאתה עוקב אחריה היא צעד קדימה" },
+  { icon: "fa-fire", text: "אתה שורף את זה!", sub: "העקביות היא הסוד לתוצאות אמיתיות" },
+  { icon: "fa-bullseye", text: "יעד ברור = הצלחה בטוחה", sub: "מה שנמדד — משתפר. המשך כך!" },
+  { icon: "fa-seedling", text: "כל יום הוא הזדמנות חדשה", sub: "לא משנה מה היה אתמול, היום חדש" },
+  { icon: "fa-bolt", text: "אנרגיה מתחילה מהצלחה", sub: "גוף שמזינים נכון — ביצועים גבוהים יותר" },
+  { icon: "fa-trophy", text: "אלופים נבנים ביום יום", sub: "כל כוס מים, כל ארוחה — זה נחשב!" },
+  { icon: "fa-star", text: "אתה יותר חזק ממה שאתה חושב", sub: "הגוף שלך מסוגל לדברים מדהימים" },
+  { icon: "fa-rocket", text: "מוכן להמריא היום?", sub: "התדלק נכון ותגיע לאן שאתה רוצה" },
+  { icon: "fa-brain", text: "מוח חד מתחיל בתזונה נכונה", sub: "מה שאוכלים משפיע על איך שחושבים" },
+  { icon: "fa-heart", text: "תאהב את הגוף שלך", sub: "כבד אותו בכל ביס שאתה בוחר" },
 ];
 
 function showMotivationSplash() {
@@ -1195,7 +1193,7 @@ function showMotivationSplash() {
 
   // Pick random motivation
   const m = MOTIVATIONS[Math.floor(Math.random() * MOTIVATIONS.length)];
-  document.getElementById("motivation-icon").textContent = m.icon;
+  document.getElementById("motivation-icon").innerHTML = `<i class="fa-solid ${m.icon}"></i>`;
   document.getElementById("motivation-text").textContent = m.text;
   document.getElementById("motivation-sub").textContent = m.sub;
 
@@ -1272,6 +1270,7 @@ function renderWater() {
   for (let i = 0; i < waterGoal; i++) {
     const cup = document.createElement("div");
     cup.className = "water-cup" + (i < waterCups ? " filled" : "");
+    cup.innerHTML = '<i class="fa-solid fa-droplet"></i>';
     cup.addEventListener("click", () => {
       waterCups = i < waterCups ? i : i + 1;
       saveWater();
