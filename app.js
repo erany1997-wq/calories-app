@@ -281,6 +281,7 @@ function refreshDashboard() {
 
   // Food log
   renderFoodLog();
+  refreshWeightDisplay();
 }
 
 function renderFoodLog() {
@@ -1465,22 +1466,83 @@ document.addEventListener("DOMContentLoaded", () => {
 // ============================================================
 
 function initWeightTracking() {
-  // Set today's date in the field
-  const dateField = document.getElementById("s-weight-date");
-  if (dateField) {
-    const now = new Date();
-    dateField.value = `${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()}`;
+  // Dashboard weight input
+  const dashInput = document.getElementById("dash-weight-input");
+  if (dashInput && profile) dashInput.value = "";
+
+  document.getElementById("btn-dash-weight-save")?.addEventListener("click", logWeightFromDash);
+
+  // Allow Enter key
+  dashInput?.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") logWeightFromDash();
+  });
+
+  refreshWeightDisplay();
+}
+
+function logWeightFromDash() {
+  const val = parseFloat(document.getElementById("dash-weight-input")?.value);
+  if (!val || val < 30 || val > 300) { showToast("אנא הזן משקל תקין"); return; }
+  saveWeightEntry(val);
+  document.getElementById("dash-weight-input").value = "";
+  refreshWeightDisplay();
+  showToast(`⚖️ משקל ${val} ק"ג נשמר!`);
+}
+
+function saveWeightEntry(val) {
+  const weightLog = getWeightLog();
+  const today = getTodayKey();
+  const existing = weightLog.findIndex(e => e.date === today);
+  if (existing >= 0) weightLog[existing].weight = val;
+  else weightLog.push({ date: today, weight: val });
+  weightLog.sort((a, b) => a.date.localeCompare(b.date));
+  localStorage.setItem("weightLog", JSON.stringify(weightLog.slice(-90)));
+  if (profile) { profile.weight = val; saveData(); }
+}
+
+function refreshWeightDisplay() {
+  const log = getWeightLog();
+  const subEl = document.getElementById("weight-quick-sub");
+  const trendEl = document.getElementById("weight-mini-trend");
+  if (!subEl) return;
+
+  const today = getTodayKey();
+  const todayEntry = log.find(e => e.date === today);
+  const last = log.length > 0 ? log[log.length - 1] : null;
+
+  if (todayEntry) {
+    subEl.textContent = `${todayEntry.weight} ק"ג נרשם היום ✓`;
+    subEl.style.color = "var(--accent)";
+  } else if (last) {
+    subEl.textContent = `אחרון: ${last.weight} ק"ג · ${formatDate(last.date)}`;
+    subEl.style.color = "var(--text-s)";
+  } else {
+    subEl.textContent = "לא נרשם עדיין";
+    subEl.style.color = "var(--text-t)";
   }
 
-  // Pre-fill current weight from profile
-  const weightField = document.getElementById("s-current-weight");
-  if (weightField && profile) weightField.value = profile.weight;
+  // Mini trend — last 7 entries
+  if (trendEl && log.length >= 2) {
+    const last7 = log.slice(-7);
+    const first = last7[0].weight;
+    const curr = last7[last7.length-1].weight;
+    const diff = (curr - first).toFixed(1);
+    const arrow = diff < 0 ? "↓" : diff > 0 ? "↑" : "→";
+    const color = diff < 0 ? "var(--accent)" : diff > 0 ? "var(--rose)" : "var(--text-t)";
+    const target = profile?.targetWeight;
+    const toTarget = target ? (curr - target).toFixed(1) : null;
 
-  document.getElementById("btn-log-weight")?.addEventListener("click", logWeight);
+    trendEl.innerHTML = `
+      <span style="color:${color};font-weight:700">${arrow} ${Math.abs(diff)} ק"ג ב-7 ימים</span>
+      ${toTarget !== null ? `<span style="color:var(--text-t);margin-right:12px">· ${parseFloat(toTarget) <= 0 ? '🎯 יעד הושג!' : `${toTarget} ק"ג עד יעד`}</span>` : ''}
+    `;
+  } else if (trendEl) {
+    trendEl.innerHTML = '';
+  }
 }
 
 function logWeight() {
-  const val = parseFloat(document.getElementById("s-current-weight").value);
+  const val = parseFloat(document.getElementById("s-current-weight-hidden")?.value);
   if (!val || val < 30 || val > 300) {
     showToast("אנא הזן משקל תקין");
     return;

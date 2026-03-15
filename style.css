@@ -589,3 +589,34 @@ select {
 /* Weight stats */
 .weight-stats { margin-top: 4px; }
 .weight-stats .summary-stat { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 12px; text-align: center; }
+
+/* Weight Quick Card */
+.weight-quick { padding: 14px 18px !important; }
+.weight-quick-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.weight-quick-left { display: flex; align-items: center; gap: 12px; }
+.weight-icon-box {
+  width: 40px; height: 40px;
+  background: var(--purple-light); color: var(--purple);
+  border-radius: var(--r-md); display: flex; align-items: center;
+  justify-content: center; font-size: 18px; flex-shrink: 0;
+}
+.weight-quick-title { font-family: var(--font-h); font-size: 15px; font-weight: 700; color: var(--text-h); }
+.weight-quick-sub { font-size: 12px; color: var(--text-s); margin-top: 2px; font-weight: 500; }
+.weight-quick-input-wrap { display: flex; gap: 6px; align-items: center; }
+.weight-quick-input-wrap input {
+  width: 80px; text-align: center;
+  font-family: var(--font-mono); font-size: 16px; font-weight: 600;
+  padding: 10px 8px; border-radius: var(--r-md);
+  background: var(--surface2); border: 1.5px solid var(--border);
+  color: var(--text-h); outline: none;
+}
+.weight-quick-input-wrap input:focus { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(139,92,246,.1); }
+.btn-weight-save {
+  width: 38px; height: 38px; background: var(--purple-light);
+  border: 1.5px solid rgba(139,92,246,.25); border-radius: var(--r-md);
+  color: var(--purple); cursor: pointer; display: flex;
+  align-items: center; justify-content: center; font-size: 15px;
+  transition: all var(--t-fast); flex-shrink: 0;
+}
+.btn-weight-save:active { background: rgba(139,92,246,.25); transform: scale(.92); }
+.weight-mini-trend { font-size: 12px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); font-weight: 500; }
