@@ -22,8 +22,11 @@ document.addEventListener("DOMContentLoaded", () => {
   initModals();
   registerSW();
   checkDayRollover();
-  // Weight tracking wired here so button exists in DOM
-  setTimeout(() => initWeightTracking(), 200);
+  initDarkMode();
+  setTimeout(() => {
+    initWeightTracking();
+    document.getElementById("btn-dark-toggle")?.addEventListener("click", toggleDarkMode);
+  }, 100);
 });
 
 function getTodayKey() {
@@ -119,9 +122,10 @@ function navigateTo(screenId) {
   });
 
   if (screenId === "dashboard") refreshDashboard();
+  if (screenId === "stats") { setTimeout(() => { renderCharts(); renderWeightChart(); }, 50); }
   if (screenId === "history") renderHistory();
   if (screenId === "food-db") renderFoodDB();
-  if (screenId === "settings") refreshSettings();
+  if (screenId === "settings") { refreshSettings(); if(document.getElementById("s-water-goal")) document.getElementById("s-water-goal").value = waterGoal; initWeightTracking(); }
 }
 
 function showInitialScreen() {
@@ -191,9 +195,6 @@ function initDashboard() {
     if (e.key === "Enter") logWeightFromDash();
   });
 
-  // Dark mode toggle
-  initDarkMode();
-  document.getElementById("btn-dark-toggle")?.addEventListener("click", toggleDarkMode);
 }
 
 function initDarkMode() {
