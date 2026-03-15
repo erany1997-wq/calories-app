@@ -308,7 +308,7 @@ function renderFoodLog() {
       <div class="food-item-icon">${item.emoji || "🍽"}</div>
       <div class="food-item-info">
         <div class="food-item-name">${item.name}</div>
-        <div class="food-item-meta">${item.amount}ג' · חלבון: ${Math.round(item.protein||0)}g · פחמ': ${Math.round(item.carbs||0)}g · שומן: ${Math.round(item.fat||0)}g</div>
+        <div class="food-item-meta">${item.unitLabel || item.amount+'ג\''} · חלבון: ${Math.round(item.protein||0)}g · פחמ': ${Math.round(item.carbs||0)}g · שומן: ${Math.round(item.fat||0)}g</div>
       </div>
       <div class="food-item-cal">${Math.round(item.cal)}</div>
       <div class="food-item-actions">
@@ -684,6 +684,7 @@ function initModals() {
   document.getElementById("btn-add-manual").addEventListener("click", addManualFood);
 
   // Portion modal
+  initUnitSelector();
   document.getElementById("btn-confirm-portion").addEventListener("click", confirmPortion);
   document.getElementById("btn-cancel-portion").addEventListener("click", () => closeModal("modal-portion"));
   document.getElementById("portion-amount").addEventListener("input", updatePortionPreview);
@@ -761,43 +762,110 @@ function addManualFood() {
 }
 
 // ============ PORTION MODAL ============
+let currentUnitGrams = 1; // grams per unit
+let currentUnitName = "גרם";
+
 function openPortionModal(food) {
   portionFood = food;
-  document.getElementById("portion-name").textContent = food.emoji + " " + food.name;
+  document.getElementById("portion-name").textContent = (food.emoji || "🍽") + " " + food.name;
   document.getElementById("portion-per100").textContent =
     `ל-100ג': ${food.per100.cal} קק"ל | חלבון: ${food.per100.protein}g | פחמ': ${food.per100.carbs}g | שומן: ${food.per100.fat}g`;
+
+  // Reset unit to grams
+  currentUnitGrams = 1;
+  currentUnitName = "גרם";
+  document.querySelectorAll(".unit-btn").forEach(b => b.classList.remove("active"));
+  document.querySelector('.unit-btn[data-unit="g"]')?.classList.add("active");
+  document.getElementById("portion-amount-label").textContent = 'כמות (גרם)';
+  document.getElementById("portion-grams-hint").textContent = '';
   document.getElementById("portion-amount").value = 100;
+
   updatePortionPreview();
   openModal("modal-portion");
 }
 
+function initUnitSelector() {
+  document.querySelectorAll(".unit-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".unit-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentUnitGrams = parseFloat(btn.dataset.grams);
+      currentUnitName = btn.textContent;
+      const label = document.getElementById("portion-amount-label");
+      const hint = document.getElementById("portion-grams-hint");
+      if (currentUnitGrams === 1) {
+        label.textContent = "כמות (גרם)";
+        hint.textContent = "";
+        document.getElementById("portion-amount").value = 100;
+      } else {
+        label.textContent = `כמות (${currentUnitName})`;
+        document.getElementById("portion-amount").value = 1;
+        const grams = 1 * currentUnitGrams;
+        hint.textContent = `= ${grams}ג'`;
+      }
+      updatePortionPreview();
+    });
+  });
+
+  // Steppers
+  document.getElementById("portion-minus")?.addEventListener("click", () => {
+    const inp = document.getElementById("portion-amount");
+    const step = currentUnitGrams === 1 ? 10 : 0.5;
+    inp.value = Math.max(parseFloat(inp.value) - step, 0.5);
+    updatePortionPreview();
+  });
+  document.getElementById("portion-plus")?.addEventListener("click", () => {
+    const inp = document.getElementById("portion-amount");
+    const step = currentUnitGrams === 1 ? 10 : 0.5;
+    inp.value = parseFloat(inp.value) + step;
+    updatePortionPreview();
+  });
+}
+
+function getPortionGrams() {
+  const qty = parseFloat(document.getElementById("portion-amount").value) || 1;
+  return qty * currentUnitGrams;
+}
+
 function updatePortionPreview() {
   if (!portionFood) return;
-  const amount = parseFloat(document.getElementById("portion-amount").value) || 100;
-  const factor = amount / 100;
-  const cal = Math.round(portionFood.per100.cal * factor);
+  const grams = getPortionGrams();
+  const factor = grams / 100;
+  const cal     = Math.round(portionFood.per100.cal * factor);
   const protein = Math.round(portionFood.per100.protein * factor * 10) / 10;
-  const carbs = Math.round(portionFood.per100.carbs * factor * 10) / 10;
-  const fat = Math.round(portionFood.per100.fat * factor * 10) / 10;
-  document.getElementById("portion-preview").innerHTML =
-    `<div style="font-size:36px;font-weight:900">${cal}</div>
-     <div style="font-size:13px;color:var(--text2);font-family:var(--font);margin-top:4px">קק"ל</div>
-     <div style="font-size:12px;color:var(--text3);margin-top:8px">חלבון: ${protein}g · פחמ': ${carbs}g · שומן: ${fat}g</div>`;
+  const carbs   = Math.round(portionFood.per100.carbs * factor * 10) / 10;
+  const fat     = Math.round(portionFood.per100.fat * factor * 10) / 10;
+
+  // Update hint
+  const hint = document.getElementById("portion-grams-hint");
+  if (hint && currentUnitGrams !== 1) {
+    hint.textContent = `= ${Math.round(grams)}ג'`;
+  }
+
+  document.getElementById("portion-preview").innerHTML = `
+    <div style="font-size:38px;font-weight:700;color:var(--neon);font-family:var(--font-mono)">${cal}</div>
+    <div style="font-size:13px;color:var(--text2);margin-top:4px">קק"ל</div>
+    <div style="font-size:12px;color:var(--text3);margin-top:8px">חלבון: ${protein}g · פחמ': ${carbs}g · שומן: ${fat}g</div>
+    <div style="font-size:11px;color:var(--text3);margin-top:4px">${Math.round(grams)}ג' סה"כ</div>`;
 }
 
 function confirmPortion() {
   if (!portionFood) return;
-  const amount = parseFloat(document.getElementById("portion-amount").value) || 100;
-  const factor = amount / 100;
+  const grams = getPortionGrams();
+  const qty   = parseFloat(document.getElementById("portion-amount").value) || 1;
+  const factor = grams / 100;
+  const unitLabel = currentUnitGrams === 1 ? `${Math.round(grams)}ג'` : `${qty} ${currentUnitName} (${Math.round(grams)}ג')`;
+
   const item = {
     id: "log_" + Date.now(),
     name: portionFood.name,
     emoji: portionFood.emoji || "🍽",
-    amount,
-    cal: Math.round(portionFood.per100.cal * factor),
+    amount: Math.round(grams),
+    unitLabel,
+    cal:     Math.round(portionFood.per100.cal * factor),
     protein: Math.round(portionFood.per100.protein * factor * 10) / 10,
-    carbs: Math.round(portionFood.per100.carbs * factor * 10) / 10,
-    fat: Math.round(portionFood.per100.fat * factor * 10) / 10,
+    carbs:   Math.round(portionFood.per100.carbs * factor * 10) / 10,
+    fat:     Math.round(portionFood.per100.fat * factor * 10) / 10,
     time: new Date().toTimeString().slice(0,5)
   };
   foodLog.push(item);
