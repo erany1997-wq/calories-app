@@ -1448,6 +1448,7 @@ function chartOptions(yLabel) {
 document.addEventListener("DOMContentLoaded", () => {
   showMotivationSplash();
   initWater();
+  initWeightTracking();
 
   // Water goal in settings
   document.getElementById("btn-save-water-goal")?.addEventListener("click", () => {
@@ -1458,3 +1459,175 @@ document.addEventListener("DOMContentLoaded", () => {
     showToast("יעד השתייה עודכן ל-" + waterGoal + " כוסות ✓");
   });
 });
+
+// ============================================================
+// WEIGHT TRACKING
+// ============================================================
+
+function initWeightTracking() {
+  // Set today's date in the field
+  const dateField = document.getElementById("s-weight-date");
+  if (dateField) {
+    const now = new Date();
+    dateField.value = `${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()}`;
+  }
+
+  // Pre-fill current weight from profile
+  const weightField = document.getElementById("s-current-weight");
+  if (weightField && profile) weightField.value = profile.weight;
+
+  document.getElementById("btn-log-weight")?.addEventListener("click", logWeight);
+}
+
+function logWeight() {
+  const val = parseFloat(document.getElementById("s-current-weight").value);
+  if (!val || val < 30 || val > 300) {
+    showToast("אנא הזן משקל תקין");
+    return;
+  }
+
+  const weightLog = getWeightLog();
+  const today = getTodayKey();
+
+  // Replace today's entry or add new one
+  const existing = weightLog.findIndex(e => e.date === today);
+  if (existing >= 0) {
+    weightLog[existing].weight = val;
+  } else {
+    weightLog.push({ date: today, weight: val });
+  }
+
+  // Keep only last 90 days
+  weightLog.sort((a, b) => a.date.localeCompare(b.date));
+  const trimmed = weightLog.slice(-90);
+
+  localStorage.setItem("weightLog", JSON.stringify(trimmed));
+
+  // Update profile weight too
+  if (profile) {
+    profile.weight = val;
+    saveData();
+    refreshSettings();
+  }
+
+  showToast(`משקל ${val} ק"ג נשמר ✓`);
+}
+
+function getWeightLog() {
+  try {
+    return JSON.parse(localStorage.getItem("weightLog") || "[]");
+  } catch(e) { return []; }
+}
+
+function renderWeightChart() {
+  const canvas = document.getElementById("chart-weight");
+  if (!canvas) return;
+
+  const log = getWeightLog();
+  if (log.length === 0) {
+    canvas.parentElement.innerHTML = '<div class="empty-log" style="padding:20px"><div class="empty-icon" style="font-size:32px">⚖️</div><p>אין נתוני משקל עדיין</p><p class="empty-sub">הוסף משקל בהגדרות</p></div>';
+    return;
+  }
+
+  // Last 30 days
+  const last30 = log.slice(-30);
+  const labels = last30.map(e => {
+    const [y,m,d] = e.date.split("-");
+    return `${d}/${m}`;
+  });
+  const weights = last30.map(e => e.weight);
+
+  // Target weight line
+  const targetWeight = profile?.targetWeight || null;
+
+  if (window.chartWeight) window.chartWeight.destroy();
+  window.chartWeight = new Chart(canvas, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "משקל",
+          data: weights,
+          borderColor: "#10B981",
+          backgroundColor: "rgba(16,185,129,0.08)",
+          borderWidth: 2.5,
+          pointBackgroundColor: "#10B981",
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          fill: true,
+          tension: 0.4,
+        },
+        ...(targetWeight ? [{
+          label: "יעד",
+          data: Array(last30.length).fill(targetWeight),
+          borderColor: "#F59E0B",
+          borderWidth: 1.5,
+          borderDash: [6, 4],
+          pointRadius: 0,
+          fill: false,
+        }] : [])
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: "rgba(15,23,42,.9)",
+          titleColor: "#f8fafc",
+          bodyColor: "#94A3B8",
+          borderColor: "rgba(16,185,129,.3)",
+          borderWidth: 1,
+          callbacks: {
+            label: ctx => ` ${ctx.raw} ק"ג`
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: "rgba(0,0,0,0.04)" },
+          ticks: { color: "#94A3B8", font: { size: 10 } }
+        },
+        y: {
+          grid: { color: "rgba(0,0,0,0.04)" },
+          ticks: {
+            color: "#94A3B8", font: { size: 10 },
+            callback: val => val + " ק"
+          },
+          beginAtZero: false,
+        }
+      }
+    }
+  });
+
+  // Weight stats summary
+  const statsEl = document.getElementById("weight-stats");
+  if (statsEl && weights.length >= 2) {
+    const first = weights[0];
+    const last = weights[weights.length - 1];
+    const diff = (last - first).toFixed(1);
+    const diffText = diff > 0 ? `+${diff}` : diff;
+    const diffColor = diff < 0 ? "#10B981" : diff > 0 ? "#F43F5E" : "#94A3B8";
+    const toTarget = targetWeight ? (last - targetWeight).toFixed(1) : null;
+
+    statsEl.innerHTML = `
+      <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+        <div class="summary-stat" style="flex:1">
+          <div class="summary-stat-val">${last}</div>
+          <div class="summary-stat-lbl">משקל נוכחי (ק"ג)</div>
+        </div>
+        <div class="summary-stat" style="flex:1">
+          <div class="summary-stat-val" style="color:${diffColor}">${diffText}</div>
+          <div class="summary-stat-lbl">שינוי (${weights.length} ימים)</div>
+        </div>
+        ${toTarget !== null ? `
+        <div class="summary-stat" style="flex:1">
+          <div class="summary-stat-val" style="color:${parseFloat(toTarget) <= 0 ? '#10B981' : '#F59E0B'}">${toTarget > 0 ? toTarget : '✓'}</div>
+          <div class="summary-stat-lbl">${parseFloat(toTarget) <= 0 ? 'יעד הושג!' : 'ק"ג עד היעד'}</div>
+        </div>` : ''}
+      </div>
+    `;
+  }
+}

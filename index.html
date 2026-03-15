@@ -244,6 +244,17 @@
           <canvas id="chart-water"></canvas>
         </div>
       </div>
+      <!-- Weight progress chart -->
+      <div class="chart-card card">
+        <div class="chart-header">
+          <span class="chart-title">משקל — 30 ימים אחרונים</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="chart-weight"></canvas>
+        </div>
+        <div class="weight-stats" id="weight-stats"></div>
+      </div>
+
       <!-- Macro breakdown -->
       <div class="chart-card card">
         <div class="chart-header">
@@ -324,6 +335,25 @@
           <div class="field"><label>משקל יעד (ק"ג)</label><input type="number" id="s-target-weight" min="30" max="300" step="0.1"></div>
         </div>
         <button class="btn-primary btn-full" id="btn-save-settings">שמור שינויים</button>
+      </div>
+
+      <!-- Weight tracking -->
+      <div class="card">
+        <h3>📊 רשום משקל היום</h3>
+        <p style="font-size:13px;color:var(--text-s);margin-bottom:14px">רשום את משקלך הנוכחי כדי לעקוב אחר ההתקדמות</p>
+        <div class="field-row two-col">
+          <div class="field">
+            <label>משקל נוכחי (ק"ג)</label>
+            <input type="number" id="s-current-weight" min="30" max="300" step="0.1" placeholder="75.5">
+          </div>
+          <div class="field">
+            <label>תאריך</label>
+            <input type="text" id="s-weight-date" readonly>
+          </div>
+        </div>
+        <button class="btn-primary btn-full" id="btn-log-weight">
+          <i class="fa-solid fa-weight-scale"></i> שמור משקל
+        </button>
       </div>
 
       <!-- Water goal setting -->
