@@ -596,9 +596,10 @@ function createSearchResultEl(food) {
     </div>
     <span class="sr-cal">${food.per100.cal} קק"ל</span>
   `;
-  el.addEventListener("click", () => {
+  el.addEventListener("click", (e) => {
+    e.stopPropagation();
     closeModal("modal-add-food");
-    openPortionModal(food);
+    setTimeout(() => openPortionModal(food), 300);
   });
   return el;
 }
@@ -643,7 +644,7 @@ async function renderSearchResults(q) {
       const localCount = products.filter(f=>!f.isAPI).length;
       header.textContent = `🇮🇱 ${ilCount} ישראלי · 🌍 ${products.length - ilCount} עולמי`;
       container.appendChild(header);
-      products.slice(0, 15).forEach(f => container.appendChild(createSearchResultEl(f)));
+      products.slice(0, 12).forEach(f => container.appendChild(createSearchResultEl(f)));
     }
   } catch(err) {
     document.getElementById("api-loading")?.remove();

@@ -390,7 +390,29 @@
     <div class="modal-handle"></div>
     <div class="portion-food-name" id="portion-name"></div>
     <div class="portion-per100" id="portion-per100"></div>
-    <div class="field"><label>כמות (גרם / מ"ל)</label><input type="number" id="portion-amount" value="100" min="1" max="2000"></div>
+
+    <!-- יחידות מידה -->
+    <div class="unit-selector" id="unit-selector">
+      <button class="unit-btn active" data-unit="g" data-grams="1">גרם</button>
+      <button class="unit-btn" data-unit="ml" data-grams="1">מ"ל</button>
+      <button class="unit-btn" data-unit="tsp" data-grams="5">כפית</button>
+      <button class="unit-btn" data-unit="tbsp" data-grams="15">כף</button>
+      <button class="unit-btn" data-unit="cup_quarter" data-grams="60">¼ כוס</button>
+      <button class="unit-btn" data-unit="cup_half" data-grams="120">½ כוס</button>
+      <button class="unit-btn" data-unit="cup" data-grams="240">כוס</button>
+      <button class="unit-btn" data-unit="piece" data-grams="30">יחידה</button>
+    </div>
+
+    <div class="portion-amount-field">
+      <label id="portion-amount-label">כמות (גרם)</label>
+      <div class="portion-amount-row">
+        <button class="portion-stepper" id="portion-minus">−</button>
+        <input type="number" id="portion-amount" value="100" min="1" max="9999">
+        <button class="portion-stepper" id="portion-plus">+</button>
+      </div>
+      <div class="portion-grams-hint" id="portion-grams-hint"></div>
+    </div>
+
     <div class="portion-preview card" id="portion-preview"></div>
     <button class="btn-primary btn-full" id="btn-confirm-portion">הוסף לרשימה</button>
     <button class="btn-secondary btn-full" id="btn-cancel-portion">ביטול</button>
