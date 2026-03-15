@@ -185,11 +185,38 @@ function initDashboard() {
   document.getElementById("btn-to-settings").addEventListener("click", () => navigateTo("settings"));
   document.getElementById("btn-open-add").addEventListener("click", () => openModal("modal-add-food"));
 
-  // Weight save button - wire here so it's always available
+  // Weight save button
   document.getElementById("btn-dash-weight-save")?.addEventListener("click", logWeightFromDash);
   document.getElementById("dash-weight-input")?.addEventListener("keypress", (e) => {
     if (e.key === "Enter") logWeightFromDash();
   });
+
+  // Dark mode toggle
+  initDarkMode();
+  document.getElementById("btn-dark-toggle")?.addEventListener("click", toggleDarkMode);
+}
+
+function initDarkMode() {
+  const saved = localStorage.getItem("darkMode");
+  if (saved === "true") {
+    document.documentElement.setAttribute("data-theme", "dark");
+  }
+}
+
+function toggleDarkMode() {
+  const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+  if (isDark) {
+    document.documentElement.removeAttribute("data-theme");
+    localStorage.setItem("darkMode", "false");
+  } else {
+    document.documentElement.setAttribute("data-theme", "dark");
+    localStorage.setItem("darkMode", "true");
+  }
+  // Re-render charts with new colors
+  if (document.getElementById("screen-stats")?.classList.contains("active")) {
+    renderCharts();
+    renderWeightChart();
+  }
 }
 
 function refreshDashboard() {
