@@ -375,13 +375,106 @@ function createDBItem(food) {
 let searchDebounceTimer = null;
 let lastSearchQuery = "";
 
-async function searchOpenFoodFacts(query) {
-  // Search both in Hebrew and English; use world + Israel
-  const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=15&fields=product_name,product_name_he,brands,nutriments,image_small_url,categories_tags`;
-  const res = await fetch(url);
+// Hebrew → English food translation dictionary
+const HE_TO_EN = {
+  // רטבים
+  "רוטב": "sauce", "קטשופ": "ketchup", "מיונז": "mayonnaise", "חרדל": "mustard",
+  "טחינה": "tahini", "חומוס": "hummus", "סלסה": "salsa", "רוטב סויה": "soy sauce",
+  "רוטב עגבניות": "tomato sauce", "פסטו": "pesto", "גוואקמולה": "guacamole",
+  // חטיפים
+  "חטיף": "snack", "קרקר": "cracker", "ביסקוויט": "biscuit", "עוגייה": "cookie",
+  "פופקורן": "popcorn", "צ'יפס": "chips", "במבה": "bamba peanut snack",
+  "ביסלי": "bisli snack", "אפרופו": "apropos snack", "שוקולד": "chocolate",
+  "וופל": "waffle", "גרנולה": "granola", "מאפה": "pastry",
+  // פחמימות
+  "פסטה": "pasta", "אורז": "rice", "לחם": "bread", "פיתה": "pita",
+  "קוסקוס": "couscous", "בורגול": "bulgur", "קינואה": "quinoa",
+  "שיבולת שועל": "oatmeal", "קמח": "flour", "תירס": "corn",
+  // חלבונים
+  "עוף": "chicken", "בשר": "beef", "הודו": "turkey", "סלמון": "salmon",
+  "טונה": "tuna", "ביצה": "egg", "טופו": "tofu", "שעועית": "beans",
+  "עדשים": "lentils", "גבינה": "cheese", "קוטג'": "cottage cheese",
+  // ירקות
+  "עגבנייה": "tomato", "מלפפון": "cucumber", "גזר": "carrot", "ברוקולי": "broccoli",
+  "תרד": "spinach", "חסה": "lettuce", "פלפל": "pepper", "בצל": "onion",
+  "שום": "garlic", "תפוח אדמה": "potato", "בטטה": "sweet potato",
+  // פירות
+  "תפוח": "apple", "בננה": "banana", "תפוז": "orange", "אבטיח": "watermelon",
+  "ענבים": "grapes", "אבוקדו": "avocado", "מנגו": "mango", "תות": "strawberry",
+  // שתייה
+  "מיץ": "juice", "חלב": "milk", "קפה": "coffee", "תה": "tea",
+  "שייק": "shake", "יוגורט": "yogurt",
+  // שמות מותגים ישראלים
+  "סיקווט": "seequet biscuit", "אסם": "osem", "תנובה": "tnuva",
+  "יוטבתה": "yotvata", "שטראוס": "strauss", "עלית": "elite chocolate",
+  "כרמית": "carmit candy", "רמי לוי": "rami levi", "מאפיות": "bakery",
+};
+
+function translateToEnglish(hebrewQuery) {
+  const q = hebrewQuery.trim().toLowerCase();
+  // Exact match
+  if (HE_TO_EN[q]) return HE_TO_EN[q];
+  // Partial match — find longest matching key
+  let best = null;
+  let bestLen = 0;
+  for (const [he, en] of Object.entries(HE_TO_EN)) {
+    if (q.includes(he) && he.length > bestLen) {
+      best = en;
+      bestLen = he.length;
+    }
+  }
+  return best;
+}
+
+function isHebrew(str) {
+  return /[\u0590-\u05FF]/.test(str);
+}
+
+async function fetchOFF(query, pageSize = 15) {
+  const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=${pageSize}&fields=product_name,product_name_he,brands,nutriments`;
+  const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
   if (!res.ok) throw new Error("API error");
   const data = await res.json();
-  return (data.products || []);
+  return data.products || [];
+}
+
+async function searchOpenFoodFacts(query) {
+  const queries = [query];
+
+  // If Hebrew — also search English translation
+  if (isHebrew(query)) {
+    const translated = translateToEnglish(query);
+    if (translated) queries.push(translated);
+    // Also try transliteration fallback with just the query as-is (some products indexed in Hebrew)
+  } else {
+    // If English, also try common Hebrew food names
+    for (const [he, en] of Object.entries(HE_TO_EN)) {
+      if (en.includes(query.toLowerCase())) {
+        queries.push(en);
+        break;
+      }
+    }
+  }
+
+  // Fire all queries in parallel
+  const results = await Promise.allSettled(queries.map(q => fetchOFF(q, 12)));
+
+  // Merge and deduplicate by product name
+  const seen = new Set();
+  const merged = [];
+  for (const r of results) {
+    if (r.status !== "fulfilled") continue;
+    for (const p of r.value) {
+      const key = (p.product_name_he || p.product_name || "").toLowerCase().slice(0, 30);
+      if (!key || seen.has(key)) continue;
+      const n = p.nutriments || {};
+      const cal = n["energy-kcal_100g"] || n["energy-kcal"] || 0;
+      if (cal <= 0) continue;
+      seen.add(key);
+      merged.push(p);
+    }
+  }
+  return merged;
 }
 
 function parseOFFProduct(product) {
@@ -392,7 +485,7 @@ function parseOFFProduct(product) {
   const fat = n["fat_100g"] || n["fat"] || 0;
 
   const name = product.product_name_he || product.product_name || "מוצר לא ידוע";
-  const brand = product.brands ? ` (${product.brands.split(",")[0].trim()})` : "";
+  const brand = product.brands ? ` · ${product.brands.split(",")[0].trim()}` : "";
 
   return {
     id: "off_" + Math.random().toString(36).slice(2),
@@ -420,59 +513,54 @@ async function renderSearchResults(q) {
   // Local results first (instant)
   const localResults = getAllFoods().filter(f => f.name.includes(q)).slice(0, 5);
 
-  // Show local + loading spinner
   container.innerHTML = "";
   if (localResults.length > 0) {
     renderLocalResults(localResults, container);
   }
 
-  // Loading indicator
+  // Show what we're searching
+  const englishQuery = isHebrew(q) ? translateToEnglish(q) : null;
+  const searchNote = englishQuery ? ` (גם: "${englishQuery}")` : "";
+
   const loadingEl = document.createElement("div");
   loadingEl.id = "api-loading";
   loadingEl.className = "api-loading";
-  loadingEl.innerHTML = `<span class="spinner"></span> מחפש במאגר עולמי...`;
+  loadingEl.innerHTML = `<span class="spinner"></span> מחפש${searchNote}...`;
   container.appendChild(loadingEl);
 
   try {
     lastSearchQuery = q;
     const products = await searchOpenFoodFacts(q);
 
-    // If query changed while fetching, ignore
     if (lastSearchQuery !== q) return;
-
-    // Remove loading
     document.getElementById("api-loading")?.remove();
 
     if (products.length === 0 && localResults.length === 0) {
-      container.innerHTML = '<div class="no-results">לא נמצאו תוצאות — הזן ידנית למטה</div>';
+      container.innerHTML = `
+        <div class="no-results">
+          לא נמצאו תוצאות עבור "${q}"<br>
+          <small>נסה באנגלית או הזן ידנית למטה</small>
+        </div>`;
       return;
     }
 
     if (products.length > 0) {
-      // Section header for API results
       const header = document.createElement("div");
       header.className = "results-section-title";
-      header.textContent = "🌍 תוצאות מהמאגר העולמי";
+      header.textContent = `🌍 מאגר עולמי — ${products.length} תוצאות`;
       container.appendChild(header);
 
-      products
-        .filter(p => {
-          const n = p.nutriments || {};
-          const cal = n["energy-kcal_100g"] || n["energy-kcal"] || 0;
-          return cal > 0 && (p.product_name_he || p.product_name);
-        })
-        .slice(0, 12)
-        .forEach(product => {
-          const food = parseOFFProduct(product);
-          container.appendChild(createSearchResultEl(food));
-        });
+      products.slice(0, 15).forEach(product => {
+        const food = parseOFFProduct(product);
+        container.appendChild(createSearchResultEl(food));
+      });
     }
 
   } catch(err) {
     document.getElementById("api-loading")?.remove();
     const errEl = document.createElement("div");
     errEl.className = "no-results";
-    errEl.textContent = "⚠️ לא ניתן להתחבר לאינטרנט — מציג תוצאות מקומיות בלבד";
+    errEl.textContent = "⚠️ שגיאת חיבור — מציג תוצאות מקומיות בלבד";
     container.appendChild(errEl);
   }
 }
@@ -513,7 +601,6 @@ async function searchFoodDBWithAPI(query) {
     return;
   }
 
-  // Local first
   const localResults = getAllFoods().filter(f => f.name.includes(query));
   list.innerHTML = "";
 
@@ -525,38 +612,38 @@ async function searchFoodDBWithAPI(query) {
     list.appendChild(section);
   }
 
+  const englishQuery = isHebrew(query) ? translateToEnglish(query) : null;
+  const searchNote = englishQuery ? ` (גם: "${englishQuery}")` : "";
+
   const loadEl = document.createElement("div");
   loadEl.id = "db-loading";
   loadEl.className = "api-loading";
-  loadEl.innerHTML = `<span class="spinner"></span> מחפש במאגר עולמי...`;
+  loadEl.innerHTML = `<span class="spinner"></span> מחפש${searchNote}...`;
   list.appendChild(loadEl);
 
   try {
     const products = await searchOpenFoodFacts(query);
     document.getElementById("db-loading")?.remove();
 
-    const valid = products.filter(p => {
-      const n = p.nutriments || {};
-      return (n["energy-kcal_100g"] || n["energy-kcal"] || 0) > 0 &&
-             (p.product_name_he || p.product_name);
-    }).slice(0, 15);
-
-    if (valid.length > 0) {
+    if (products.length > 0) {
       const section = document.createElement("div");
       section.className = "db-category";
-      section.innerHTML = `<div class="db-category-title">🌍 מאגר עולמי (Open Food Facts)</div>`;
-      valid.forEach(p => {
+      section.innerHTML = `<div class="db-category-title">🌍 מאגר עולמי — ${products.length} תוצאות</div>`;
+      products.slice(0, 20).forEach(p => {
         const food = parseOFFProduct(p);
         section.appendChild(createDBItem(food));
       });
       list.appendChild(section);
     }
 
-    if (localResults.length === 0 && valid.length === 0) {
-      list.innerHTML = '<div class="empty-log"><div class="empty-icon">🔍</div><p>לא נמצאו תוצאות</p></div>';
+    if (localResults.length === 0 && products.length === 0) {
+      list.innerHTML = `<div class="empty-log"><div class="empty-icon">🔍</div><p>לא נמצאו תוצאות</p><p class="empty-sub">נסה באנגלית</p></div>`;
     }
   } catch(e) {
     document.getElementById("db-loading")?.remove();
+    if (localResults.length === 0) {
+      list.innerHTML = `<div class="empty-log"><div class="empty-icon">⚠️</div><p>שגיאת חיבור</p></div>`;
+    }
   }
 }
 
