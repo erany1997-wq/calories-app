@@ -202,6 +202,16 @@ function initDarkMode() {
   if (saved === "true") {
     document.documentElement.setAttribute("data-theme", "dark");
   }
+  // Create dark mode button dynamically and add to header
+  const headerRight = document.querySelector(".header-right");
+  if (headerRight && !document.getElementById("btn-dark-toggle")) {
+    const btn = document.createElement("div");
+    btn.id = "btn-dark-toggle";
+    btn.className = "dark-toggle";
+    btn.title = "מצב לילה";
+    btn.onclick = toggleDarkMode;
+    headerRight.insertBefore(btn, headerRight.firstChild);
+  }
 }
 
 function toggleDarkMode() {
