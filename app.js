@@ -508,46 +508,7 @@ function translateToEnglish(hebrewQuery) {
 
 function isHebrew(str) { return /[֐-׿]/.test(str); }
 
-// ---- USDA FoodData Central API ----
-const USDA_KEY = "DEMO_KEY"; // Free demo key — 30 req/min
-
-async function searchUSDA(query) {
-  const url = `https://api.nal.usda.gov/fdc/v1/foods/search?query=${encodeURIComponent(query)}&pageSize=15&dataType=SR%20Legacy,Foundation,Branded&api_key=${USDA_KEY}`;
-  const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
-  if (!res.ok) throw new Error("USDA error");
-  const data = await res.json();
-  return data.foods || [];
-}
-
-function parseUSDAFood(food) {
-  const getNutrient = (id) => {
-    const n = (food.foodNutrients || []).find(n => n.nutrientId === id);
-    return n ? (n.value || 0) : 0;
-  };
-  const cal     = getNutrient(1008) || getNutrient(2048) || 0;
-  const protein = getNutrient(1003) || 0;
-  const carbs   = getNutrient(1005) || 0;
-  const fat     = getNutrient(1004) || 0;
-
-  const name = food.description || "מוצר";
-  const brand = food.brandOwner ? ` · ${food.brandOwner}` : "";
-
-  return {
-    id: "usda_" + food.fdcId,
-    name: name + brand,
-    emoji: "🥗",
-    category: "other",
-    isAPI: true,
-    per100: {
-      cal:     Math.round(cal),
-      protein: Math.round(protein * 10) / 10,
-      carbs:   Math.round(carbs * 10) / 10,
-      fat:     Math.round(fat * 10) / 10
-    }
-  };
-}
-
-// ---- Combined search: USDA + Open Food Facts ----
+// ---- Open Food Facts API (no key needed) ----
 async function fetchOFF(query, pageSize = 10) {
   const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=${pageSize}&fields=product_name,product_name_he,brands,nutriments`;
   const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
@@ -580,34 +541,33 @@ function parseOFFProduct(product) {
 }
 
 async function searchAllAPIs(query) {
-  // Determine English search term
-  const englishQuery = isHebrew(query) ? (translateToEnglish(query) || query) : query;
+  // Build list of queries: Hebrew + English translation + original
+  const queries = new Set();
+  if (isHebrew(query)) {
+    const en = translateToEnglish(query);
+    if (en) queries.add(en);
+    // also try each word translated
+    const words = query.split(" ");
+    if (words.length > 1) {
+      const enWords = words.map(w => translateToEnglish(w) || w).join(" ");
+      queries.add(enWords);
+    }
+  } else {
+    queries.add(query);
+  }
+  // always add original too (might be English or brand name)
+  queries.add(query);
 
-  // Run USDA + OFF in parallel
-  const [usdaRes, offRes] = await Promise.allSettled([
-    searchUSDA(englishQuery),
-    fetchOFF(englishQuery, 10)
-  ]);
+  // Fire all OFF queries in parallel
+  const allSettled = await Promise.allSettled(
+    [...queries].map(q => fetchOFF(q, 15))
+  );
 
   const seen = new Set();
   const results = [];
-
-  // USDA results first (better data quality)
-  if (usdaRes.status === "fulfilled") {
-    for (const food of usdaRes.value) {
-      if (!food.description) continue;
-      const key = food.description.toLowerCase().slice(0, 30);
-      if (seen.has(key)) continue;
-      const parsed = parseUSDAFood(food);
-      if (parsed.per100.cal <= 0) continue;
-      seen.add(key);
-      results.push(parsed);
-    }
-  }
-
-  // OFF results after
-  if (offRes.status === "fulfilled") {
-    for (const p of offRes.value) {
+  for (const r of allSettled) {
+    if (r.status !== "fulfilled") continue;
+    for (const p of r.value) {
       const name = (p.product_name_he || p.product_name || "").toLowerCase().slice(0, 30);
       if (!name || seen.has(name)) continue;
       const n = p.nutriments || {};
@@ -617,7 +577,6 @@ async function searchAllAPIs(query) {
       results.push(parseOFFProduct(p));
     }
   }
-
   return results;
 }
 
