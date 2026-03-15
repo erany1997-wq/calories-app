@@ -518,60 +518,14 @@ function translateToEnglish(hebrewQuery) {
 
 function isHebrew(str) { return /[֐-׿]/.test(str); }
 
-// ---- Search Engine: Israeli Gov DB + Open Food Facts ----
+// ---- Search Engine ----
 
-// Israeli Ministry of Health - National Nutrition Database (data.gov.il)
-// 4500+ Israeli food items, free, no API key needed
-const IL_RESOURCE_ID = "b8bfd5a5-e6ce-4e89-8783-5e3f9a8b8a4f";
-
-async function searchIsraeliGovDB(query) {
-  const url = `https://data.gov.il/api/3/action/datastore_search?resource_id=${IL_RESOURCE_ID}&limit=15&q=${encodeURIComponent(query)}`;
-  const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
-  if (!res.ok) throw new Error("IL Gov API error");
+async function fetchOFF(query, pageSize = 15) {
+  const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=${pageSize}&fields=product_name,product_name_he,brands,nutriments`;
+  const res = await fetch(url, { signal: AbortSignal.timeout(7000) });
+  if (!res.ok) throw new Error("OFF error");
   const data = await res.json();
-  if (!data.success) throw new Error("IL Gov API failed");
-  return data.result?.records || [];
-}
-
-function parseIsraeliGovFood(record) {
-  // Field names from the Israeli National Nutrition Database
-  const name = record["שם מזון"] || record["food_name"] || record["FoodName"] || record["name"] || "מזון ישראלי";
-  const cal  = parseFloat(record["אנרגיה (קק"ל)"] || record["energy_kcal"] || record["calories"] || record["Calories"] || 0);
-  const protein = parseFloat(record["חלבון (ג')"] || record["protein"] || record["Protein"] || 0);
-  const carbs   = parseFloat(record["פחמימות (ג')"] || record["carbohydrates"] || record["Carbohydrates"] || 0);
-  const fat     = parseFloat(record["שומן (ג')"] || record["fat"] || record["Fat"] || 0);
-
-  if (!name || cal <= 0) return null;
-
-  return {
-    id: "il_" + (record["_id"] || Math.random().toString(36).slice(2)),
-    name: name.trim(),
-    emoji: "🇮🇱",
-    category: "other",
-    isAPI: true,
-    per100: {
-      cal: Math.round(cal),
-      protein: Math.round(protein * 10) / 10,
-      carbs:   Math.round(carbs * 10) / 10,
-      fat:     Math.round(fat * 10) / 10
-    }
-  };
-}
-
-// Open Food Facts fallback
-async function fetchOFF(query, pageSize = 10) {
-  const urls = [
-    `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=${pageSize}&fields=product_name,product_name_he,brands,nutriments`,
-  ];
-  for (const url of urls) {
-    try {
-      const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
-      if (!res.ok) continue;
-      const data = await res.json();
-      if (data.products?.length > 0) return data.products;
-    } catch(e) { continue; }
-  }
-  return [];
+  return data.products || [];
 }
 
 function parseOFFProduct(product) {
@@ -589,46 +543,8 @@ function parseOFFProduct(product) {
     emoji: "🛒",
     category: "other",
     isAPI: true,
-    per100: {
-      cal:     Math.round(cal),
-      protein: Math.round(protein * 10) / 10,
-      carbs:   Math.round(carbs * 10) / 10,
-      fat:     Math.round(fat * 10) / 10
-    }
+    per100: { cal: Math.round(cal), protein: Math.round(protein*10)/10, carbs: Math.round(carbs*10)/10, fat: Math.round(fat*10)/10 }
   };
-}
-
-// Local instant fallback for common items
-const INSTANT_FOODS = {
-  "מיונז": {cal:680,protein:1,carbs:0.6,fat:75,name:"מיונז"},
-  "מיונז קל": {cal:300,protein:1.5,carbs:8,fat:30,name:"מיונז קל 30%"},
-  "מיונז סושי": {cal:500,protein:1,carbs:5,fat:52,name:"מיונז סושי (ספייסי)"},
-  "סויה": {cal:60,protein:8,carbs:5,fat:0,name:"רוטב סויה"},
-  "רוטב סויה": {cal:60,protein:8,carbs:5,fat:0,name:"רוטב סויה"},
-  "קטשופ": {cal:101,protein:1.7,carbs:25,fat:0.1,name:"קטשופ"},
-  "חרדל": {cal:66,protein:4,carbs:6,fat:4,name:"חרדל"},
-  "טחינה": {cal:570,protein:17,carbs:26,fat:48,name:"טחינה גולמית"},
-  "סריראצ'ה": {cal:93,protein:3,carbs:18,fat:1,name:"סריראצ'ה"},
-  "פסטו": {cal:430,protein:6,carbs:5,fat:43,name:"פסטו"},
-  "bbq": {cal:172,protein:1,carbs:40,fat:0.5,name:"רוטב BBQ"},
-  "ברביקיו": {cal:172,protein:1,carbs:40,fat:0.5,name:"רוטב BBQ"},
-  "נוטלה": {cal:539,protein:6,carbs:58,fat:31,name:"נוטלה"},
-  "שמן זית": {cal:884,protein:0,carbs:0,fat:100,name:"שמן זית"},
-  "חמאה": {cal:717,protein:0.9,carbs:0.1,fat:81,name:"חמאה"},
-};
-
-function searchInstant(query) {
-  const q = query.toLowerCase().trim();
-  return Object.entries(INSTANT_FOODS)
-    .filter(([k]) => q.includes(k) || k.includes(q))
-    .map(([, v]) => ({
-      id: "inst_" + v.name,
-      name: v.name,
-      emoji: "⭐",
-      category: "sauces",
-      isAPI: false,
-      per100: {cal:v.cal, protein:v.protein, carbs:v.carbs, fat:v.fat}
-    }));
 }
 
 async function searchAllAPIs(query) {
@@ -636,40 +552,29 @@ async function searchAllAPIs(query) {
   const seen = new Set();
   const results = [];
 
-  // 1. Instant local match (immediate)
-  const instant = searchInstant(query);
-  instant.forEach(f => { seen.add(f.name); results.push(f); });
-
-  // 2. Israeli Gov DB (Hebrew search — best for Israeli foods!)
-  // 3. Open Food Facts (English search)
-  const [ilRes, offRes] = await Promise.allSettled([
-    searchIsraeliGovDB(query),
-    fetchOFF(isHebrew(query) ? englishQuery : query, 12)
-  ]);
-
-  // Israeli Gov results
-  if (ilRes.status === "fulfilled") {
-    for (const record of ilRes.value) {
-      const food = parseIsraeliGovFood(record);
-      if (!food || seen.has(food.name)) continue;
-      seen.add(food.name);
-      results.push(food);
-    }
+  // Always search both Hebrew and English in OFF
+  const queriesToSearch = new Set([query]);
+  if (englishQuery !== query) queriesToSearch.add(englishQuery);
+  // Add word-by-word translation
+  if (isHebrew(query)) {
+    const words = query.split(" ");
+    words.forEach(w => { const t = translateToEnglish(w); if (t) queriesToSearch.add(t); });
   }
 
-  // OFF results
-  if (offRes.status === "fulfilled") {
-    for (const p of offRes.value) {
+  const settled = await Promise.allSettled([...queriesToSearch].map(q => fetchOFF(q, 15)));
+  for (const r of settled) {
+    if (r.status !== "fulfilled") continue;
+    for (const p of r.value) {
       const food = parseOFFProduct(p);
-      if (!food || seen.has(food.name.slice(0,20))) continue;
-      seen.add(food.name.slice(0,20));
+      if (!food) continue;
+      const key = food.name.toLowerCase().slice(0, 25);
+      if (seen.has(key)) continue;
+      seen.add(key);
       results.push(food);
     }
   }
-
   return results;
 }
-
 
 function renderLocalResults(results, container) {
   if (!results.length) return;
@@ -795,12 +700,19 @@ function initModals() {
   document.getElementById("food-search").addEventListener("input", (e) => {
     const q = e.target.value.trim();
     clearTimeout(searchDebounceTimer);
-    if (!q || q.length < 2) {
-      document.getElementById("search-results").innerHTML = "";
+    const container = document.getElementById("search-results");
+    if (!q || q.length < 1) {
+      container.innerHTML = "";
       return;
     }
-    // Show local immediately, debounce API call
-    searchDebounceTimer = setTimeout(() => renderSearchResults(q), 400);
+    // Show local results immediately
+    const localResults = getAllFoods().filter(f => f.name.includes(q)).slice(0, 6);
+    container.innerHTML = "";
+    if (localResults.length > 0) renderLocalResults(localResults, container);
+    // Then API after 350ms
+    if (q.length >= 2) {
+      searchDebounceTimer = setTimeout(() => renderSearchResults(q), 350);
+    }
   });
 
   document.getElementById("btn-close-modal").addEventListener("click", () => closeModal("modal-add-food"));
