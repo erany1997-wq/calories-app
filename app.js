@@ -22,11 +22,9 @@ document.addEventListener("DOMContentLoaded", () => {
   initModals();
   registerSW();
   checkDayRollover();
-  initDarkMode();
   setTimeout(() => {
     initWeightTracking();
-    document.getElementById("btn-dark-toggle")?.addEventListener("click", toggleDarkMode);
-  }, 100);
+    }, 100);
 });
 
 function getTodayKey() {
@@ -197,35 +195,8 @@ function initDashboard() {
 
 }
 
-function initDarkMode() {
-  const saved = localStorage.getItem("darkMode");
-  if (saved === "true") {
-    document.documentElement.setAttribute("data-theme", "dark");
-  }
-  updateDarkBtn();
-}
 
-function updateDarkBtn() {
-  const btn = document.getElementById("btn-dark-toggle");
-  if (!btn) return;
-  const isDark = document.documentElement.getAttribute("data-theme") === "dark";
-  btn.innerHTML = isDark ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
-}
 
-function toggleDarkMode() {
-  const isDark = document.documentElement.getAttribute("data-theme") === "dark";
-  if (isDark) {
-    document.documentElement.removeAttribute("data-theme");
-    localStorage.setItem("darkMode", "false");
-  } else {
-    document.documentElement.setAttribute("data-theme", "dark");
-    localStorage.setItem("darkMode", "true");
-  }
-  updateDarkBtn();
-  if (document.getElementById("screen-stats")?.classList.contains("active")) {
-    renderCharts(); renderWeightChart();
-  }
-}
 
 function refreshDashboard() {
   if (!profile) return;
