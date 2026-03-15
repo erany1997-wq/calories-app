@@ -3,157 +3,125 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-  
-  <!-- iOS PWA Meta Tags -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="קלוריות">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#0a0a0f">
-  
-  <!-- PWA Manifest -->
+  <meta name="theme-color" content="#040812">
   <link rel="manifest" href="manifest.json">
-  
-  <!-- Apple Touch Icons -->
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-  
   <title>קלוריות — מעקב תזונה</title>
-  
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Heebo:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- App Shell -->
-  <div id="app">
-    
-    <!-- Splash / Onboarding (shown if no profile) -->
-    <div id="screen-onboarding" class="screen active">
-      <div class="onboard-bg">
-        <div class="orb orb1"></div>
-        <div class="orb orb2"></div>
-        <div class="orb orb3"></div>
+<div id="app">
+
+  <!-- MOTIVATION SPLASH (shows on load) -->
+  <div id="motivation-splash" class="motivation-splash">
+    <div class="motivation-orbs">
+      <div class="m-orb m-orb1"></div>
+      <div class="m-orb m-orb2"></div>
+    </div>
+    <div class="motivation-content">
+      <div class="motivation-icon" id="motivation-icon">💪</div>
+      <div class="motivation-text" id="motivation-text"></div>
+      <div class="motivation-sub" id="motivation-sub"></div>
+      <button class="btn-motivation-close" id="btn-motivation-close">בואו נתחיל!</button>
+    </div>
+  </div>
+
+  <!-- Onboarding -->
+  <div id="screen-onboarding" class="screen">
+    <div class="onboard-bg">
+      <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+    </div>
+    <div class="onboard-content">
+      <div class="logo-wrap">
+        <div class="logo-icon">⚡</div>
+        <h1 class="logo-text">קלוריות</h1>
+        <p class="logo-sub">מעקב תזונה חכם</p>
       </div>
-      <div class="onboard-content">
-        <div class="logo-wrap">
-          <div class="logo-icon">⚡</div>
-          <h1 class="logo-text">קלוריות</h1>
-          <p class="logo-sub">מעקב תזונה חכם</p>
+      <div class="onboard-form card">
+        <h2>הגדרת פרופיל</h2>
+        <p class="form-desc">כדי לחשב את צרכי הקלוריות שלך, נזדקק לכמה פרטים</p>
+        <div class="field-row">
+          <div class="field"><label>שם (אופציונלי)</label><input type="text" id="ob-name" placeholder="השם שלך"></div>
         </div>
-        <div class="onboard-form card">
-          <h2>הגדרת פרופיל</h2>
-          <p class="form-desc">כדי לחשב את צרכי הקלוריות שלך, נזדקק לכמה פרטים</p>
-          
-          <div class="field-row">
-            <div class="field">
-              <label>שם (אופציונלי)</label>
-              <input type="text" id="ob-name" placeholder="השם שלך">
-            </div>
-          </div>
-
-          <div class="field-row two-col">
-            <div class="field">
-              <label>גיל</label>
-              <input type="number" id="ob-age" placeholder="30" min="10" max="120">
-            </div>
-            <div class="field">
-              <label>מין</label>
-              <select id="ob-gender">
-                <option value="male">זכר</option>
-                <option value="female">נקבה</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="field-row two-col">
-            <div class="field">
-              <label>גובה (ס"מ)</label>
-              <input type="number" id="ob-height" placeholder="175" min="100" max="250">
-            </div>
-            <div class="field">
-              <label>משקל (ק"ג)</label>
-              <input type="number" id="ob-weight" placeholder="75" min="30" max="300" step="0.1">
-            </div>
-          </div>
-
-          <div class="field-row">
-            <div class="field">
-              <label>רמת פעילות גופנית</label>
-              <select id="ob-activity">
-                <option value="1.2">יושבני (ללא ספורט)</option>
-                <option value="1.375">קל (1-3 פעמים בשבוע)</option>
-                <option value="1.55" selected>מתון (3-5 פעמים)</option>
-                <option value="1.725">אינטנסיבי (6-7 פעמים)</option>
-                <option value="1.9">מאוד אינטנסיבי (עבודה פיזית + ספורט)</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="field-row">
-            <div class="field">
-              <label>מטרה</label>
-              <div class="goal-tabs">
-                <button class="goal-tab active" data-goal="lose">ירידה במשקל</button>
-                <button class="goal-tab" data-goal="maintain">שמירה</button>
-                <button class="goal-tab" data-goal="gain">עלייה במשקל</button>
-              </div>
-            </div>
-          </div>
-
-          <div id="goal-details" class="goal-details-wrap">
-            <!-- lose weight options -->
-            <div id="goal-lose" class="goal-section">
-              <div class="field-row two-col">
-                <div class="field">
-                  <label>ירידה רצויה (ק"ג/חודש)</label>
-                  <input type="number" id="ob-monthly-loss" placeholder="2" min="0.5" max="8" step="0.5" value="2">
-                </div>
-                <div class="field">
-                  <label>משקל יעד (ק"ג)</label>
-                  <input type="number" id="ob-target-weight" placeholder="65" min="30" max="300" step="0.1">
-                </div>
-              </div>
-            </div>
-            <div id="goal-maintain" class="goal-section hidden"></div>
-            <div id="goal-gain" class="goal-section hidden">
-              <div class="field">
-                <label>עלייה רצויה (ק"ג/חודש)</label>
-                <input type="number" id="ob-monthly-gain" placeholder="1" min="0.5" max="4" step="0.5" value="1">
-              </div>
-            </div>
-          </div>
-
-          <button class="btn-primary btn-full" id="btn-save-profile">
-            <span>התחל לעקוב</span>
-            <span class="btn-icon">→</span>
-          </button>
+        <div class="field-row two-col">
+          <div class="field"><label>גיל</label><input type="number" id="ob-age" placeholder="30" min="10" max="120"></div>
+          <div class="field"><label>מין</label><select id="ob-gender"><option value="male">זכר</option><option value="female">נקבה</option></select></div>
         </div>
+        <div class="field-row two-col">
+          <div class="field"><label>גובה (ס"מ)</label><input type="number" id="ob-height" placeholder="175" min="100" max="250"></div>
+          <div class="field"><label>משקל (ק"ג)</label><input type="number" id="ob-weight" placeholder="75" min="30" max="300" step="0.1"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>רמת פעילות גופנית</label>
+            <select id="ob-activity">
+              <option value="1.2">יושבני (ללא ספורט)</option>
+              <option value="1.375">קל (1-3 פעמים בשבוע)</option>
+              <option value="1.55" selected>מתון (3-5 פעמים)</option>
+              <option value="1.725">אינטנסיבי (6-7 פעמים)</option>
+              <option value="1.9">מאוד אינטנסיבי</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>מטרה</label>
+            <div class="goal-tabs">
+              <button class="goal-tab active" data-goal="lose">ירידה במשקל</button>
+              <button class="goal-tab" data-goal="maintain">שמירה</button>
+              <button class="goal-tab" data-goal="gain">עלייה במשקל</button>
+            </div>
+          </div>
+        </div>
+        <div id="goal-details" class="goal-details-wrap">
+          <div id="goal-lose" class="goal-section">
+            <div class="field-row two-col">
+              <div class="field"><label>ירידה רצויה (ק"ג/חודש)</label><input type="number" id="ob-monthly-loss" placeholder="2" min="0.5" max="8" step="0.5" value="2"></div>
+              <div class="field"><label>משקל יעד (ק"ג)</label><input type="number" id="ob-target-weight" placeholder="65" min="30" max="300" step="0.1"></div>
+            </div>
+          </div>
+          <div id="goal-maintain" class="goal-section hidden"></div>
+          <div id="goal-gain" class="goal-section hidden">
+            <div class="field"><label>עלייה רצויה (ק"ג/חודש)</label><input type="number" id="ob-monthly-gain" placeholder="1" min="0.5" max="4" step="0.5" value="1"></div>
+          </div>
+        </div>
+        <button class="btn-primary btn-full" id="btn-save-profile"><span>התחל לעקוב</span><span class="btn-icon">→</span></button>
       </div>
     </div>
+  </div>
 
-    <!-- Main Dashboard -->
-    <div id="screen-dashboard" class="screen">
-      <div class="app-header">
-        <div class="header-left">
-          <div class="date-display" id="header-date"></div>
-          <div class="greeting" id="header-greeting"></div>
-        </div>
-        <div class="header-right">
-          <button class="icon-btn" id="btn-to-settings" aria-label="הגדרות">⚙</button>
-        </div>
+  <!-- Dashboard -->
+  <div id="screen-dashboard" class="screen">
+    <div class="app-header">
+      <div class="header-left">
+        <div class="date-display" id="header-date"></div>
+        <div class="greeting" id="header-greeting"></div>
       </div>
-
+      <div class="header-right">
+        <button class="icon-btn" id="btn-to-settings" aria-label="הגדרות">⚙</button>
+      </div>
+    </div>
+    <div class="dashboard-scroll">
       <!-- Calorie Ring -->
       <div class="calorie-hero">
         <div class="ring-container">
           <svg class="calorie-ring" viewBox="0 0 200 200">
-            <circle class="ring-bg" cx="100" cy="100" r="85" />
-            <circle class="ring-fill" id="ring-fill" cx="100" cy="100" r="85" 
-                    stroke-dasharray="534" stroke-dashoffset="534"/>
+            <defs>
+              <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#00f5c4"/><stop offset="100%" stop-color="#0ea5e9"/>
+              </linearGradient>
+              <linearGradient id="ringGradientWarn" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#fb923c"/>
+              </linearGradient>
+            </defs>
+            <circle class="ring-bg" cx="100" cy="100" r="85"/>
+            <circle class="ring-glow" id="ring-glow" cx="100" cy="100" r="85" stroke-dasharray="534" stroke-dashoffset="534"/>
+            <circle class="ring-fill" id="ring-fill" cx="100" cy="100" r="85" stroke-dasharray="534" stroke-dashoffset="534"/>
           </svg>
           <div class="ring-inner">
             <div class="ring-remaining" id="ring-remaining">—</div>
@@ -161,59 +129,62 @@
           </div>
         </div>
         <div class="calorie-stats">
-          <div class="stat-pill">
-            <span class="stat-icon">🎯</span>
-            <div>
-              <div class="stat-val" id="stat-goal">—</div>
-              <div class="stat-lbl">יעד</div>
-            </div>
-          </div>
-          <div class="stat-pill">
-            <span class="stat-icon">🍽</span>
-            <div>
-              <div class="stat-val" id="stat-eaten">0</div>
-              <div class="stat-lbl">נצרך</div>
-            </div>
-          </div>
-          <div class="stat-pill">
-            <span class="stat-icon">🔥</span>
-            <div>
-              <div class="stat-val" id="stat-burned">0</div>
-              <div class="stat-lbl">נשרף</div>
-            </div>
-          </div>
+          <div class="stat-pill"><span class="stat-icon">🎯</span><div><div class="stat-val" id="stat-goal">—</div><div class="stat-lbl">יעד</div></div></div>
+          <div class="stat-pill"><span class="stat-icon">🍽</span><div><div class="stat-val" id="stat-eaten">0</div><div class="stat-lbl">נצרך</div></div></div>
+          <div class="stat-pill"><span class="stat-icon">🔥</span><div><div class="stat-val" id="stat-burned">0</div><div class="stat-lbl">נשרף</div></div></div>
         </div>
       </div>
 
-      <!-- Macros bar -->
+      <!-- Progress Bar -->
+      <div class="progress-bar-wrap">
+        <div class="progress-label-row">
+          <span class="progress-title">יעד קלורי יומי</span>
+          <span class="progress-pct" id="progress-pct">0%</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+      </div>
+
+      <!-- Water Tracker -->
+      <div class="water-card card">
+        <div class="water-header">
+          <div class="water-title-row">
+            <span class="water-icon-big">💧</span>
+            <div>
+              <div class="water-title">מעקב שתייה</div>
+              <div class="water-sub" id="water-sub">0 / 8 כוסות</div>
+            </div>
+          </div>
+          <div class="water-goal-btn" id="btn-water-goal">⚙</div>
+        </div>
+        <div class="water-cups" id="water-cups"></div>
+        <div class="water-actions">
+          <button class="btn-water-add" id="btn-water-add">+ כוס</button>
+          <button class="btn-water-reset" id="btn-water-reset">אפס</button>
+        </div>
+      </div>
+
+      <!-- Macros -->
       <div class="macros-row card">
         <div class="macro">
-          <div class="macro-bar-wrap">
-            <div class="macro-bar protein-bar" id="bar-protein"></div>
-          </div>
+          <div class="macro-bar-wrap"><div class="macro-bar protein-bar" id="bar-protein"></div></div>
           <span class="macro-val" id="val-protein">0g</span>
           <span class="macro-name">חלבון</span>
         </div>
         <div class="macro">
-          <div class="macro-bar-wrap">
-            <div class="macro-bar carb-bar" id="bar-carbs"></div>
-          </div>
+          <div class="macro-bar-wrap"><div class="macro-bar carb-bar" id="bar-carbs"></div></div>
           <span class="macro-val" id="val-carbs">0g</span>
           <span class="macro-name">פחמימות</span>
         </div>
         <div class="macro">
-          <div class="macro-bar-wrap">
-            <div class="macro-bar fat-bar" id="bar-fat"></div>
-          </div>
+          <div class="macro-bar-wrap"><div class="macro-bar fat-bar" id="bar-fat"></div></div>
           <span class="macro-val" id="val-fat">0g</span>
           <span class="macro-name">שומן</span>
         </div>
       </div>
 
-      <!-- Add Food Button -->
+      <!-- Add Food -->
       <button class="btn-add-food" id="btn-open-add">
-        <span class="plus-icon">+</span>
-        <span>הוסף אוכל</span>
+        <span class="plus-icon">+</span><span>הוסף אוכל</span>
       </button>
 
       <!-- Food Log -->
@@ -228,258 +199,242 @@
           <p class="empty-sub">לחץ על "הוסף אוכל" כדי להתחיל</p>
         </div>
       </div>
-
-      <!-- Bottom Nav -->
-      <nav class="bottom-nav">
-        <button class="nav-btn active" data-screen="dashboard">
-          <span class="nav-icon">🏠</span>
-          <span>בית</span>
-        </button>
-        <button class="nav-btn" data-screen="history">
-          <span class="nav-icon">📊</span>
-          <span>היסטוריה</span>
-        </button>
-        <button class="nav-btn" data-screen="food-db">
-          <span class="nav-icon">🔍</span>
-          <span>מזון</span>
-        </button>
-        <button class="nav-btn" data-screen="settings">
-          <span class="nav-icon">⚙</span>
-          <span>הגדרות</span>
-        </button>
-      </nav>
     </div>
 
-    <!-- History Screen -->
-    <div id="screen-history" class="screen">
-      <div class="app-header">
-        <h2 class="screen-title">היסטוריה</h2>
-      </div>
-      <div class="history-content" id="history-content">
-        <div class="empty-log">
-          <div class="empty-icon">📅</div>
-          <p>אין היסטוריה עדיין</p>
-        </div>
-      </div>
-      <nav class="bottom-nav">
-        <button class="nav-btn" data-screen="dashboard"><span class="nav-icon">🏠</span><span>בית</span></button>
-        <button class="nav-btn active" data-screen="history"><span class="nav-icon">📊</span><span>היסטוריה</span></button>
-        <button class="nav-btn" data-screen="food-db"><span class="nav-icon">🔍</span><span>מזון</span></button>
-        <button class="nav-btn" data-screen="settings"><span class="nav-icon">⚙</span><span>הגדרות</span></button>
-      </nav>
+    <nav class="bottom-nav">
+      <button class="nav-btn active" data-screen="dashboard"><span class="nav-icon">🏠</span><span>בית</span></button>
+      <button class="nav-btn" data-screen="stats"><span class="nav-icon">📈</span><span>גרפים</span></button>
+      <button class="nav-btn" data-screen="food-db"><span class="nav-icon">🔍</span><span>מזון</span></button>
+      <button class="nav-btn" data-screen="settings"><span class="nav-icon">⚙</span><span>הגדרות</span></button>
+    </nav>
+  </div>
+
+  <!-- Stats / Charts Screen -->
+  <div id="screen-stats" class="screen">
+    <div class="app-header">
+      <h2 class="screen-title">גרפים וסטטיסטיקה</h2>
     </div>
-
-    <!-- Food Database Screen -->
-    <div id="screen-food-db" class="screen">
-      <div class="app-header">
-        <h2 class="screen-title">מאגר מזון</h2>
-        <button class="icon-btn" id="btn-add-custom-food">+</button>
+    <div class="stats-content">
+      <!-- Weekly calories chart -->
+      <div class="chart-card card">
+        <div class="chart-header">
+          <span class="chart-title">קלוריות — 7 ימים אחרונים</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="chart-calories"></canvas>
+        </div>
       </div>
-      <div class="search-wrap">
-        <input type="search" id="db-search" placeholder="חפש מזון...">
+      <!-- Weekly water chart -->
+      <div class="chart-card card">
+        <div class="chart-header">
+          <span class="chart-title">שתייה — 7 ימים אחרונים</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="chart-water"></canvas>
+        </div>
       </div>
-      <div class="food-db-list" id="food-db-list"></div>
-      <nav class="bottom-nav">
-        <button class="nav-btn" data-screen="dashboard"><span class="nav-icon">🏠</span><span>בית</span></button>
-        <button class="nav-btn" data-screen="history"><span class="nav-icon">📊</span><span>היסטוריה</span></button>
-        <button class="nav-btn active" data-screen="food-db"><span class="nav-icon">🔍</span><span>מזון</span></button>
-        <button class="nav-btn" data-screen="settings"><span class="nav-icon">⚙</span><span>הגדרות</span></button>
-      </nav>
+      <!-- Macro breakdown -->
+      <div class="chart-card card">
+        <div class="chart-header">
+          <span class="chart-title">פירוט מקרואים — היום</span>
+        </div>
+        <div class="chart-wrap chart-wrap-sm">
+          <canvas id="chart-macros"></canvas>
+        </div>
+        <div class="macro-legend" id="macro-legend"></div>
+      </div>
+      <!-- Summary stats -->
+      <div class="stats-summary card" id="stats-summary"></div>
     </div>
+    <nav class="bottom-nav">
+      <button class="nav-btn" data-screen="dashboard"><span class="nav-icon">🏠</span><span>בית</span></button>
+      <button class="nav-btn active" data-screen="stats"><span class="nav-icon">📈</span><span>גרפים</span></button>
+      <button class="nav-btn" data-screen="food-db"><span class="nav-icon">🔍</span><span>מזון</span></button>
+      <button class="nav-btn" data-screen="settings"><span class="nav-icon">⚙</span><span>הגדרות</span></button>
+    </nav>
+  </div>
 
-    <!-- Settings Screen -->
-    <div id="screen-settings" class="screen">
-      <div class="app-header">
-        <h2 class="screen-title">הגדרות</h2>
-      </div>
-      <div class="settings-content">
-        <div class="card info-card" id="bmr-card">
-          <h3>הנתונים שלך</h3>
-          <div class="info-grid" id="bmr-info"></div>
-        </div>
-        <div class="card">
-          <h3>עדכון פרופיל</h3>
-          <div class="field-row two-col">
-            <div class="field"><label>גיל</label><input type="number" id="s-age" min="10" max="120"></div>
-            <div class="field"><label>מין</label>
-              <select id="s-gender">
-                <option value="male">זכר</option>
-                <option value="female">נקבה</option>
-              </select>
-            </div>
-          </div>
-          <div class="field-row two-col">
-            <div class="field"><label>גובה (ס"מ)</label><input type="number" id="s-height" min="100" max="250"></div>
-            <div class="field"><label>משקל (ק"ג)</label><input type="number" id="s-weight" min="30" max="300" step="0.1"></div>
-          </div>
-          <div class="field-row">
-            <div class="field">
-              <label>רמת פעילות</label>
-              <select id="s-activity">
-                <option value="1.2">יושבני</option>
-                <option value="1.375">קל</option>
-                <option value="1.55">מתון</option>
-                <option value="1.725">אינטנסיבי</option>
-                <option value="1.9">מאוד אינטנסיבי</option>
-              </select>
-            </div>
-          </div>
-          <div class="field-row">
-            <div class="field">
-              <label>מטרה</label>
-              <div class="goal-tabs" id="s-goal-tabs">
-                <button class="goal-tab" data-goal="lose">ירידה</button>
-                <button class="goal-tab" data-goal="maintain">שמירה</button>
-                <button class="goal-tab" data-goal="gain">עלייה</button>
-              </div>
-            </div>
-          </div>
-          <div class="field-row" id="s-loss-row">
-            <div class="field"><label>ירידה (ק"ג/חודש)</label><input type="number" id="s-monthly-change" min="0.5" max="8" step="0.5"></div>
-          </div>
-          <div class="field-row" id="s-target-row">
-            <div class="field"><label>משקל יעד (ק"ג)</label><input type="number" id="s-target-weight" min="30" max="300" step="0.1"></div>
-          </div>
-          <button class="btn-primary btn-full" id="btn-save-settings">שמור שינויים</button>
-        </div>
-
-        <div class="card danger-card">
-          <h3>איפוס נתונים</h3>
-          <p>מחיקת כל הנתונים של היום</p>
-          <button class="btn-danger" id="btn-reset-day">אפס יום</button>
-          <p style="margin-top:12px">מחיקת כל הנתונים (כולל פרופיל)</p>
-          <button class="btn-danger" id="btn-reset-all">אפס הכל</button>
-        </div>
-      </div>
-      <nav class="bottom-nav">
-        <button class="nav-btn" data-screen="dashboard"><span class="nav-icon">🏠</span><span>בית</span></button>
-        <button class="nav-btn" data-screen="history"><span class="nav-icon">📊</span><span>היסטוריה</span></button>
-        <button class="nav-btn" data-screen="food-db"><span class="nav-icon">🔍</span><span>מזון</span></button>
-        <button class="nav-btn active" data-screen="settings"><span class="nav-icon">⚙</span><span>הגדרות</span></button>
-      </nav>
+  <!-- Food DB Screen -->
+  <div id="screen-food-db" class="screen">
+    <div class="app-header">
+      <h2 class="screen-title">מאגר מזון</h2>
+      <button class="icon-btn" id="btn-add-custom-food">+</button>
     </div>
+    <div class="search-wrap"><input type="search" id="db-search" placeholder="חפש מזון..."></div>
+    <div class="food-db-list" id="food-db-list"></div>
+    <nav class="bottom-nav">
+      <button class="nav-btn" data-screen="dashboard"><span class="nav-icon">🏠</span><span>בית</span></button>
+      <button class="nav-btn" data-screen="stats"><span class="nav-icon">📈</span><span>גרפים</span></button>
+      <button class="nav-btn active" data-screen="food-db"><span class="nav-icon">🔍</span><span>מזון</span></button>
+      <button class="nav-btn" data-screen="settings"><span class="nav-icon">⚙</span><span>הגדרות</span></button>
+    </nav>
+  </div>
 
-  </div><!-- /app -->
-
-  <!-- Add Food Modal -->
-  <div class="modal-overlay" id="modal-add-food">
-    <div class="modal-sheet">
-      <div class="modal-handle"></div>
-      <h3 class="modal-title">הוספת מזון</h3>
-      
-      <div class="search-wrap">
-        <input type="search" id="food-search" placeholder="חפש מזון..." autocomplete="off">
+  <!-- Settings Screen -->
+  <div id="screen-settings" class="screen">
+    <div class="app-header"><h2 class="screen-title">הגדרות</h2></div>
+    <div class="settings-content">
+      <div class="card info-card" id="bmr-card">
+        <h3>הנתונים שלך</h3>
+        <div class="info-grid" id="bmr-info"></div>
       </div>
-      
-      <div class="search-results" id="search-results"></div>
-
-      <div class="manual-entry card" id="manual-entry">
-        <h4>הזנה ידנית</h4>
+      <div class="card">
+        <h3>עדכון פרופיל</h3>
+        <div class="field-row two-col">
+          <div class="field"><label>גיל</label><input type="number" id="s-age" min="10" max="120"></div>
+          <div class="field"><label>מין</label><select id="s-gender"><option value="male">זכר</option><option value="female">נקבה</option></select></div>
+        </div>
+        <div class="field-row two-col">
+          <div class="field"><label>גובה (ס"מ)</label><input type="number" id="s-height" min="100" max="250"></div>
+          <div class="field"><label>משקל (ק"ג)</label><input type="number" id="s-weight" min="30" max="300" step="0.1"></div>
+        </div>
         <div class="field-row">
-          <div class="field"><label>שם המזון</label><input type="text" id="manual-name" placeholder="למשל: סלט ירקות"></div>
+          <div class="field"><label>רמת פעילות</label>
+            <select id="s-activity">
+              <option value="1.2">יושבני</option><option value="1.375">קל</option>
+              <option value="1.55">מתון</option><option value="1.725">אינטנסיבי</option>
+              <option value="1.9">מאוד אינטנסיבי</option>
+            </select>
+          </div>
         </div>
-        <div class="field-row two-col">
-          <div class="field"><label>קלוריות</label><input type="number" id="manual-cal" placeholder="200" min="0"></div>
-          <div class="field"><label>כמות (ג' / מ"ל)</label><input type="number" id="manual-amount" placeholder="100" min="1"></div>
-        </div>
-        <div class="field-row two-col">
-          <div class="field"><label>חלבון (ג')</label><input type="number" id="manual-protein" placeholder="0" min="0" step="0.1"></div>
-          <div class="field"><label>פחמימות (ג')</label><input type="number" id="manual-carbs" placeholder="0" min="0" step="0.1"></div>
-        </div>
-        <div class="field-row two-col">
-          <div class="field"><label>שומן (ג')</label><input type="number" id="manual-fat" placeholder="0" min="0" step="0.1"></div>
-          <div class="field"><label>שמור במאגר?</label>
-            <div class="toggle-wrap">
-              <input type="checkbox" id="manual-save" class="toggle-input">
-              <label for="manual-save" class="toggle-label"></label>
+        <div class="field-row">
+          <div class="field"><label>מטרה</label>
+            <div class="goal-tabs" id="s-goal-tabs">
+              <button class="goal-tab" data-goal="lose">ירידה</button>
+              <button class="goal-tab" data-goal="maintain">שמירה</button>
+              <button class="goal-tab" data-goal="gain">עלייה</button>
             </div>
           </div>
         </div>
-        <button class="btn-primary btn-full" id="btn-add-manual">הוסף</button>
+        <div class="field-row" id="s-loss-row">
+          <div class="field"><label>ירידה (ק"ג/חודש)</label><input type="number" id="s-monthly-change" min="0.5" max="8" step="0.5"></div>
+        </div>
+        <div class="field-row" id="s-target-row">
+          <div class="field"><label>משקל יעד (ק"ג)</label><input type="number" id="s-target-weight" min="30" max="300" step="0.1"></div>
+        </div>
+        <button class="btn-primary btn-full" id="btn-save-settings">שמור שינויים</button>
       </div>
 
-      <button class="btn-close-modal" id="btn-close-modal">ביטול</button>
+      <!-- Water goal setting -->
+      <div class="card">
+        <h3>יעד שתייה יומי</h3>
+        <div class="field-row">
+          <div class="field"><label>מספר כוסות ביום (250מ"ל כל כוס)</label>
+            <input type="number" id="s-water-goal" min="4" max="20" value="8">
+          </div>
+        </div>
+        <button class="btn-primary btn-full" id="btn-save-water-goal">שמור</button>
+      </div>
+
+      <div class="card danger-card">
+        <h3>איפוס נתונים</h3>
+        <p>מחיקת כל הנתונים של היום</p>
+        <button class="btn-danger" id="btn-reset-day">אפס יום</button>
+        <p style="margin-top:12px">מחיקת כל הנתונים (כולל פרופיל)</p>
+        <button class="btn-danger" id="btn-reset-all">אפס הכל</button>
+      </div>
     </div>
+    <nav class="bottom-nav">
+      <button class="nav-btn" data-screen="dashboard"><span class="nav-icon">🏠</span><span>בית</span></button>
+      <button class="nav-btn" data-screen="stats"><span class="nav-icon">📈</span><span>גרפים</span></button>
+      <button class="nav-btn" data-screen="food-db"><span class="nav-icon">🔍</span><span>מזון</span></button>
+      <button class="nav-btn active" data-screen="settings"><span class="nav-icon">⚙</span><span>הגדרות</span></button>
+    </nav>
   </div>
 
-  <!-- Portion Modal -->
-  <div class="modal-overlay" id="modal-portion">
-    <div class="modal-sheet modal-sheet-sm">
-      <div class="modal-handle"></div>
-      <div class="portion-food-name" id="portion-name"></div>
-      <div class="portion-per100" id="portion-per100"></div>
-      <div class="field">
-        <label>כמות (גרם / מ"ל)</label>
-        <input type="number" id="portion-amount" value="100" min="1" max="2000">
-      </div>
-      <div class="portion-preview card" id="portion-preview"></div>
-      <button class="btn-primary btn-full" id="btn-confirm-portion">הוסף לרשימה</button>
-      <button class="btn-secondary btn-full" id="btn-cancel-portion">ביטול</button>
-    </div>
-  </div>
+</div><!-- /app -->
 
-  <!-- Custom Food Modal -->
-  <div class="modal-overlay" id="modal-custom-food">
-    <div class="modal-sheet">
-      <div class="modal-handle"></div>
-      <h3 class="modal-title">הוספת מזון למאגר</h3>
-      <div class="field-row">
-        <div class="field"><label>שם המזון</label><input type="text" id="cf-name" placeholder="שם המזון"></div>
+<!-- Modals -->
+<div class="modal-overlay" id="modal-add-food">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">הוספת מזון</h3>
+    <div class="search-wrap"><input type="search" id="food-search" placeholder="חפש מזון..." autocomplete="off"></div>
+    <div class="search-results" id="search-results"></div>
+    <div class="manual-entry card" id="manual-entry">
+      <h4>הזנה ידנית</h4>
+      <div class="field-row"><div class="field"><label>שם המזון</label><input type="text" id="manual-name" placeholder="למשל: סלט ירקות"></div></div>
+      <div class="field-row two-col">
+        <div class="field"><label>קלוריות</label><input type="number" id="manual-cal" placeholder="200" min="0"></div>
+        <div class="field"><label>כמות (ג' / מ"ל)</label><input type="number" id="manual-amount" placeholder="100" min="1"></div>
       </div>
-      <div class="field-row">
-        <div class="field"><label>קטגוריה</label>
-          <select id="cf-category">
-            <option value="protein">חלבונים</option>
-            <option value="carbs">פחמימות</option>
-            <option value="dairy">מוצרי חלב</option>
-            <option value="veggies">ירקות ופירות</option>
-            <option value="fats">שומנים</option>
-            <option value="other">אחר</option>
-          </select>
+      <div class="field-row two-col">
+        <div class="field"><label>חלבון (ג')</label><input type="number" id="manual-protein" placeholder="0" min="0" step="0.1"></div>
+        <div class="field"><label>פחמימות (ג')</label><input type="number" id="manual-carbs" placeholder="0" min="0" step="0.1"></div>
+      </div>
+      <div class="field-row two-col">
+        <div class="field"><label>שומן (ג')</label><input type="number" id="manual-fat" placeholder="0" min="0" step="0.1"></div>
+        <div class="field"><label>שמור במאגר?</label>
+          <div class="toggle-wrap"><input type="checkbox" id="manual-save" class="toggle-input"><label for="manual-save" class="toggle-label"></label></div>
         </div>
       </div>
-      <p class="form-desc">ערכים ל-100 גרם / מ"ל</p>
-      <div class="field-row two-col">
-        <div class="field"><label>קלוריות</label><input type="number" id="cf-cal" placeholder="0" min="0"></div>
-        <div class="field"><label>חלבון (ג')</label><input type="number" id="cf-protein" placeholder="0" min="0" step="0.1"></div>
-      </div>
-      <div class="field-row two-col">
-        <div class="field"><label>פחמימות (ג')</label><input type="number" id="cf-carbs" placeholder="0" min="0" step="0.1"></div>
-        <div class="field"><label>שומן (ג')</label><input type="number" id="cf-fat" placeholder="0" min="0" step="0.1"></div>
-      </div>
-      <button class="btn-primary btn-full" id="btn-save-custom-food">שמור</button>
-      <button class="btn-secondary btn-full" id="btn-cancel-custom-food">ביטול</button>
+      <button class="btn-primary btn-full" id="btn-add-manual">הוסף</button>
     </div>
+    <button class="btn-close-modal" id="btn-close-modal">ביטול</button>
   </div>
+</div>
 
-  <!-- Edit Food Modal -->
-  <div class="modal-overlay" id="modal-edit-food">
-    <div class="modal-sheet modal-sheet-sm">
-      <div class="modal-handle"></div>
-      <h3 class="modal-title">עריכת פריט</h3>
-      <div class="field-row">
-        <div class="field"><label>שם</label><input type="text" id="edit-name"></div>
-      </div>
-      <div class="field-row two-col">
-        <div class="field"><label>קלוריות</label><input type="number" id="edit-cal" min="0"></div>
-        <div class="field"><label>כמות (ג')</label><input type="number" id="edit-amount" min="1"></div>
-      </div>
-      <div class="field-row two-col">
-        <div class="field"><label>חלבון (ג')</label><input type="number" id="edit-protein" min="0" step="0.1"></div>
-        <div class="field"><label>פחמימות (ג')</label><input type="number" id="edit-carbs" min="0" step="0.1"></div>
-      </div>
-      <div class="field">
-        <label>שומן (ג')</label><input type="number" id="edit-fat" min="0" step="0.1">
-      </div>
-      <button class="btn-primary btn-full" id="btn-save-edit">שמור</button>
-      <button class="btn-secondary btn-full" id="btn-cancel-edit">ביטול</button>
+<div class="modal-overlay" id="modal-portion">
+  <div class="modal-sheet modal-sheet-sm">
+    <div class="modal-handle"></div>
+    <div class="portion-food-name" id="portion-name"></div>
+    <div class="portion-per100" id="portion-per100"></div>
+    <div class="field"><label>כמות (גרם / מ"ל)</label><input type="number" id="portion-amount" value="100" min="1" max="2000"></div>
+    <div class="portion-preview card" id="portion-preview"></div>
+    <button class="btn-primary btn-full" id="btn-confirm-portion">הוסף לרשימה</button>
+    <button class="btn-secondary btn-full" id="btn-cancel-portion">ביטול</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-custom-food">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">הוספת מזון למאגר</h3>
+    <div class="field-row"><div class="field"><label>שם המזון</label><input type="text" id="cf-name" placeholder="שם המזון"></div></div>
+    <div class="field-row"><div class="field"><label>קטגוריה</label>
+      <select id="cf-category">
+        <option value="protein">חלבונים</option><option value="carbs">פחמימות</option>
+        <option value="dairy">מוצרי חלב</option><option value="veggies">ירקות ופירות</option>
+        <option value="fats">שומנים</option><option value="other">אחר</option>
+      </select>
+    </div></div>
+    <p class="form-desc">ערכים ל-100 גרם / מ"ל</p>
+    <div class="field-row two-col">
+      <div class="field"><label>קלוריות</label><input type="number" id="cf-cal" placeholder="0" min="0"></div>
+      <div class="field"><label>חלבון (ג')</label><input type="number" id="cf-protein" placeholder="0" min="0" step="0.1"></div>
     </div>
+    <div class="field-row two-col">
+      <div class="field"><label>פחמימות (ג')</label><input type="number" id="cf-carbs" placeholder="0" min="0" step="0.1"></div>
+      <div class="field"><label>שומן (ג')</label><input type="number" id="cf-fat" placeholder="0" min="0" step="0.1"></div>
+    </div>
+    <button class="btn-primary btn-full" id="btn-save-custom-food">שמור</button>
+    <button class="btn-secondary btn-full" id="btn-cancel-custom-food">ביטול</button>
   </div>
+</div>
 
-  <!-- Toast -->
-  <div class="toast" id="toast"></div>
+<div class="modal-overlay" id="modal-edit-food">
+  <div class="modal-sheet modal-sheet-sm">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">עריכת פריט</h3>
+    <div class="field-row"><div class="field"><label>שם</label><input type="text" id="edit-name"></div></div>
+    <div class="field-row two-col">
+      <div class="field"><label>קלוריות</label><input type="number" id="edit-cal" min="0"></div>
+      <div class="field"><label>כמות (ג')</label><input type="number" id="edit-amount" min="1"></div>
+    </div>
+    <div class="field-row two-col">
+      <div class="field"><label>חלבון (ג')</label><input type="number" id="edit-protein" min="0" step="0.1"></div>
+      <div class="field"><label>פחמימות (ג')</label><input type="number" id="edit-carbs" min="0" step="0.1"></div>
+    </div>
+    <div class="field"><label>שומן (ג')</label><input type="number" id="edit-fat" min="0" step="0.1"></div>
+    <button class="btn-primary btn-full" id="btn-save-edit">שמור</button>
+    <button class="btn-secondary btn-full" id="btn-cancel-edit">ביטול</button>
+  </div>
+</div>
 
-  <script src="data.js"></script>
-  <script src="app.js"></script>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

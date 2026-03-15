@@ -21,7 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
   initSettings();
   initModals();
   registerSW();
-  injectSVGDefs();
   checkDayRollover();
 });
 
@@ -218,16 +217,52 @@ function refreshDashboard() {
   ringEl.style.strokeDasharray = circumference;
   ringEl.style.strokeDashoffset = offset;
 
+  // Sync glow ring
+  const glowEl = document.getElementById("ring-glow");
+  if (glowEl) {
+    glowEl.style.strokeDasharray = circumference;
+    glowEl.style.strokeDashoffset = offset;
+  }
+
+  // Color state: ok → warn (80%) → over (100%+)
+  const svgEl = document.querySelector(".calorie-ring");
+  const pct = (totalEaten / target) * 100;
+
   if (remaining < 0) {
     ringEl.classList.add("over-budget");
+    ringEl.classList.remove("warn-state");
     remainingEl.classList.add("over-budget");
     remainingEl.textContent = Math.abs(remaining);
     document.querySelector(".ring-label").textContent = "חריגה";
-  } else {
+    svgEl?.classList.add("over-budget-ring");
+    svgEl?.classList.remove("warn-state");
+  } else if (pct >= 80) {
+    ringEl.classList.add("warn-state");
     ringEl.classList.remove("over-budget");
     remainingEl.classList.remove("over-budget");
     remainingEl.textContent = remaining;
     document.querySelector(".ring-label").textContent = "נשאר";
+    svgEl?.classList.add("warn-state");
+    svgEl?.classList.remove("over-budget-ring");
+  } else {
+    ringEl.classList.remove("over-budget", "warn-state");
+    remainingEl.classList.remove("over-budget");
+    remainingEl.textContent = remaining;
+    document.querySelector(".ring-label").textContent = "נשאר";
+    svgEl?.classList.remove("over-budget-ring", "warn-state");
+  }
+
+  // Progress bar
+  const fillEl = document.getElementById("progress-fill");
+  const pctEl = document.getElementById("progress-pct");
+  if (fillEl && pctEl) {
+    const barPct = Math.min(Math.round(pct), 100);
+    fillEl.style.width = barPct + "%";
+    pctEl.textContent = Math.round(pct) + "%";
+    fillEl.classList.remove("warn", "over");
+    pctEl.classList.remove("warn", "over");
+    if (pct > 100) { fillEl.classList.add("over"); pctEl.classList.add("over"); }
+    else if (pct >= 80) { fillEl.classList.add("warn"); pctEl.classList.add("warn"); }
   }
 
   // Macros
@@ -1007,19 +1042,6 @@ function showToast(msg) {
   setTimeout(() => el.classList.remove("show"), 2500);
 }
 
-// ============ SVG GRADIENT ============
-function injectSVGDefs() {
-  const svg = document.querySelector(".calorie-ring");
-  const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
-  defs.innerHTML = `
-    <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#7c6cf0"/>
-      <stop offset="100%" stop-color="#5ce0c5"/>
-    </linearGradient>
-  `;
-  svg.insertBefore(defs, svg.firstChild);
-  document.getElementById("ring-fill").setAttribute("stroke", "url(#ringGradient)");
-}
 
 // ============ SERVICE WORKER ============
 function registerSW() {
@@ -1027,3 +1049,317 @@ function registerSW() {
     navigator.serviceWorker.register("sw.js").catch(() => {});
   }
 }
+
+// ============================================================
+// MOTIVATION MESSAGES
+// ============================================================
+const MOTIVATIONS = [
+  { icon: "💪", text: "כוח הוא בנייה של הרגלים!", sub: "כל ארוחה שאתה עוקב אחריה היא צעד קדימה" },
+  { icon: "🔥", text: "אתה שורף את זה!", sub: "העקביות היא הסוד לתוצאות אמיתיות" },
+  { icon: "🎯", text: "יעד ברור = הצלחה בטוחה", sub: "מה שנמדד — משתפר. המשך כך!" },
+  { icon: "🌱", text: "כל יום הוא הזדמנות חדשה", sub: "לא משנה מה היה אתמול, היום חדש" },
+  { icon: "⚡", text: "אנרגיה מתחילה מהצלחה", sub: "גוף שמזינים נכון — ביצועים גבוהים יותר" },
+  { icon: "🏆", text: "אלופים נבנים ביום יום", sub: "כל כוס מים, כל ארוחה — זה נחשב!" },
+  { icon: "🌊", text: "זרום עם ההתקדמות שלך", sub: "תהליך איטי ועקבי עולה על ספרינט קצר" },
+  { icon: "✨", text: "אתה יותר חזק ממה שאתה חושב", sub: "הגוף שלך מסוגל לדברים מדהימים" },
+  { icon: "🎶", text: "מצא את הקצב שלך", sub: "תזונה טובה היא מוזיקה לגוף" },
+  { icon: "🚀", text: "מוכן להמריא היום?", sub: "התדלק נכון ותגיע לאן שאתה רוצה" },
+  { icon: "🧠", text: "מוח חד מתחיל בתזונה נכונה", sub: "מה שאוכלים משפיע על איך שחושבים" },
+  { icon: "❤️", text: "תאהב את הגוף שלך", sub: "כבד אותו בכל ביס שאתה בוחר" },
+];
+
+function showMotivationSplash() {
+  const splash = document.getElementById("motivation-splash");
+  if (!splash) return;
+
+  // Pick random motivation
+  const m = MOTIVATIONS[Math.floor(Math.random() * MOTIVATIONS.length)];
+  document.getElementById("motivation-icon").textContent = m.icon;
+  document.getElementById("motivation-text").textContent = m.text;
+  document.getElementById("motivation-sub").textContent = m.sub;
+
+  document.getElementById("btn-motivation-close").addEventListener("click", () => {
+    splash.classList.add("hide");
+    setTimeout(() => splash.remove(), 500);
+  });
+
+  // Auto-close after 6 seconds
+  setTimeout(() => {
+    if (document.getElementById("motivation-splash")) {
+      splash.classList.add("hide");
+      setTimeout(() => splash.remove(), 500);
+    }
+  }, 6000);
+}
+
+// ============================================================
+// WATER TRACKER
+// ============================================================
+let waterCups = 0;
+let waterGoal = 8;
+
+function loadWater() {
+  const saved = localStorage.getItem("water_" + todayKey);
+  waterCups = saved ? parseInt(saved) : 0;
+  const goal = localStorage.getItem("waterGoal");
+  waterGoal = goal ? parseInt(goal) : 8;
+}
+
+function saveWater() {
+  localStorage.setItem("water_" + todayKey, waterCups);
+  localStorage.setItem("waterGoal", waterGoal);
+}
+
+function initWater() {
+  loadWater();
+  renderWater();
+
+  document.getElementById("btn-water-add").addEventListener("click", () => {
+    if (waterCups < waterGoal) {
+      waterCups++;
+      saveWater();
+      renderWater();
+      if (waterCups === waterGoal) showToast("🎉 יעד השתייה הושג!");
+    } else {
+      showToast("כבר הגעת ליעד! 💧");
+    }
+  });
+
+  document.getElementById("btn-water-reset").addEventListener("click", () => {
+    waterCups = 0;
+    saveWater();
+    renderWater();
+  });
+}
+
+function renderWater() {
+  const container = document.getElementById("water-cups");
+  const sub = document.getElementById("water-sub");
+  if (!container || !sub) return;
+
+  sub.textContent = `${waterCups} / ${waterGoal} כוסות · ${waterCups * 250} מ"ל`;
+
+  container.innerHTML = "";
+  for (let i = 0; i < waterGoal; i++) {
+    const cup = document.createElement("div");
+    cup.className = "water-cup" + (i < waterCups ? " filled" : "");
+    cup.addEventListener("click", () => {
+      waterCups = i < waterCups ? i : i + 1;
+      saveWater();
+      renderWater();
+    });
+    container.appendChild(cup);
+  }
+}
+
+// ============================================================
+// CHARTS
+// ============================================================
+let chartCalories = null;
+let chartWater = null;
+let chartMacros = null;
+
+function getLast7Days() {
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const label = i === 0 ? "היום" : i === 1 ? "אתמול" : `${d.getDate()}/${d.getMonth()+1}`;
+    days.push({ key, label });
+  }
+  return days;
+}
+
+function renderCharts() {
+  const days = getLast7Days();
+
+  // Calories data
+  const calData = days.map(d => {
+    const log = JSON.parse(localStorage.getItem("foodLog_" + d.key) || "[]");
+    return log.reduce((s, i) => s + (i.cal || 0), 0);
+  });
+
+  // Water data
+  const waterData = days.map(d => {
+    return parseInt(localStorage.getItem("water_" + d.key) || "0");
+  });
+
+  const labels = days.map(d => d.label);
+  const target = profile ? calcDailyCalorieTarget(profile) : 2000;
+
+  // Calories chart
+  const ctxCal = document.getElementById("chart-calories");
+  if (ctxCal) {
+    if (chartCalories) chartCalories.destroy();
+    chartCalories = new Chart(ctxCal, {
+      type: "bar",
+      data: {
+        labels,
+        datasets: [{
+          label: "קלוריות",
+          data: calData,
+          backgroundColor: calData.map(v => v > target ? "rgba(244,63,94,.7)" : v > target * 0.8 ? "rgba(251,191,36,.7)" : "rgba(0,245,196,.7)"),
+          borderRadius: 8,
+          borderSkipped: false,
+        }, {
+          label: "יעד",
+          data: Array(7).fill(target),
+          type: "line",
+          borderColor: "rgba(14,165,233,.6)",
+          borderWidth: 2,
+          borderDash: [6, 4],
+          pointRadius: 0,
+          fill: false,
+        }]
+      },
+      options: chartOptions("קק\"ל")
+    });
+  }
+
+  // Water chart
+  const ctxWater = document.getElementById("chart-water");
+  if (ctxWater) {
+    if (chartWater) chartWater.destroy();
+    chartWater = new Chart(ctxWater, {
+      type: "bar",
+      data: {
+        labels,
+        datasets: [{
+          label: "כוסות",
+          data: waterData,
+          backgroundColor: "rgba(14,165,233,.6)",
+          borderRadius: 8,
+          borderSkipped: false,
+        }, {
+          label: "יעד",
+          data: Array(7).fill(waterGoal),
+          type: "line",
+          borderColor: "rgba(0,245,196,.6)",
+          borderWidth: 2,
+          borderDash: [6, 4],
+          pointRadius: 0,
+          fill: false,
+        }]
+      },
+      options: chartOptions("כוסות")
+    });
+  }
+
+  // Macros donut
+  const ctxMacros = document.getElementById("chart-macros");
+  if (ctxMacros) {
+    const todayLog = JSON.parse(localStorage.getItem("foodLog_" + todayKey) || "[]");
+    const p = todayLog.reduce((s, i) => s + (i.protein || 0), 0);
+    const c = todayLog.reduce((s, i) => s + (i.carbs || 0), 0);
+    const f = todayLog.reduce((s, i) => s + (i.fat || 0), 0);
+
+    if (chartMacros) chartMacros.destroy();
+    chartMacros = new Chart(ctxMacros, {
+      type: "doughnut",
+      data: {
+        labels: ["חלבון", "פחמימות", "שומן"],
+        datasets: [{
+          data: [Math.round(p), Math.round(c), Math.round(f)],
+          backgroundColor: ["rgba(0,245,196,.8)", "rgba(251,191,36,.8)", "rgba(244,63,94,.8)"],
+          borderWidth: 0,
+          hoverOffset: 8,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => ` ${ctx.label}: ${ctx.raw}g`
+            },
+            backgroundColor: "rgba(8,14,30,.9)",
+            titleColor: "#e8f4ff", bodyColor: "#7a9bbf",
+            borderColor: "rgba(0,245,196,.2)", borderWidth: 1,
+          }
+        },
+        cutout: "65%",
+      }
+    });
+
+    // Legend
+    const legend = document.getElementById("macro-legend");
+    if (legend) {
+      legend.innerHTML = [
+        { color: "#00f5c4", label: "חלבון", val: Math.round(p) + "g" },
+        { color: "#fbbf24", label: "פחמימות", val: Math.round(c) + "g" },
+        { color: "#f43f5e", label: "שומן", val: Math.round(f) + "g" },
+      ].map(l => `
+        <div class="legend-item">
+          <div class="legend-dot" style="background:${l.color}"></div>
+          <span>${l.label}: <strong style="color:${l.color}">${l.val}</strong></span>
+        </div>
+      `).join("");
+    }
+  }
+
+  // Summary stats
+  const summaryEl = document.getElementById("stats-summary");
+  if (summaryEl) {
+    const avgCal = Math.round(calData.reduce((a,b) => a+b, 0) / 7);
+    const daysLogged = calData.filter(v => v > 0).length;
+    const avgWater = Math.round(waterData.reduce((a,b) => a+b, 0) / 7);
+    const bestDay = Math.max(...calData);
+
+    summaryEl.innerHTML = [
+      { val: avgCal, lbl: 'ממוצע קלורי יומי' },
+      { val: daysLogged + '/7', lbl: 'ימים עם מעקב' },
+      { val: avgWater, lbl: 'ממוצע כוסות יומי' },
+      { val: bestDay, lbl: 'שיא קלורי שבועי' },
+    ].map(s => `
+      <div class="summary-stat">
+        <div class="summary-stat-val">${s.val}</div>
+        <div class="summary-stat-lbl">${s.lbl}</div>
+      </div>
+    `).join("");
+  }
+}
+
+function chartOptions(yLabel) {
+  return {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: "rgba(8,14,30,.9)",
+        titleColor: "#e8f4ff", bodyColor: "#7a9bbf",
+        borderColor: "rgba(0,245,196,.2)", borderWidth: 1,
+        rtl: true,
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: "rgba(255,255,255,.04)" },
+        ticks: { color: "#3d5470", font: { size: 11 } }
+      },
+      y: {
+        grid: { color: "rgba(255,255,255,.04)" },
+        ticks: { color: "#3d5470", font: { size: 11 } },
+        beginAtZero: true,
+      }
+    }
+  };
+}
+
+// ============================================================
+// INIT ADDITIONS — patch into DOMContentLoaded
+// ============================================================
+document.addEventListener("DOMContentLoaded", () => {
+  showMotivationSplash();
+  initWater();
+
+  // Water goal in settings
+  document.getElementById("btn-save-water-goal")?.addEventListener("click", () => {
+    const val = parseInt(document.getElementById("s-water-goal").value) || 8;
+    waterGoal = Math.max(4, Math.min(20, val));
+    saveWater();
+    renderWater();
+    showToast("יעד השתייה עודכן ל-" + waterGoal + " כוסות ✓");
+  });
+});
